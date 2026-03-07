@@ -34,6 +34,7 @@ bill-splitter/
 │   │   ├── parse.js         # POST /api/parse — bill image -> JSON
 │   │   ├── assign.js        # POST /api/assign — items + instructions -> assignments
 │   │   ├── people.js        # GET/POST /api/people
+│   │   ├── preferences.js   # GET/POST /api/preferences
 │   │   ├── save.js          # POST /api/save — save session to history
 │   │   └── load.js          # POST /api/load — load session from JSON upload
 │   └── index.js
@@ -65,8 +66,8 @@ Upload -> Review -> People -> Instructions -> Assign -> Split -> Output
 
 1. **Upload** — Drag & drop or file picker for image/PDF. Preview uploaded file. On confirm -> advance to Review. Accepts `initialFile`/`initialPreviewUrl` to restore on back-nav.
 2. **Review** — Calls `/api/parse` on first visit (skips if `initialData` present from back-nav or JSON test file). Editable table with item name, type (food/alcohol), qty, unit price, SC amount, tax amount, effective price. Tax/GST % and SC % with manual override. Side-by-side bill preview. Bill total reconciliation with match/mismatch indicator.
-3. **People** — Load from `data/people.json` as selectable chips (sorted alphabetically). Select All / Select None buttons. Can add new person (saves back, auto-selected). Selected people carry forward.
-4. **Instructions** — Free text for natural language assignment hints (e.g. "Split pizza between A, B and C", "A had all the beers"). Multiple instructions allowed. On confirm -> call `/api/assign`.
+3. **People** — Load from `data/people.json` as selectable chips (sorted alphabetically). Select All / Select None buttons. Can add new person (saves back, auto-selected). Selected chips show a ✎ edit icon that opens a **modal dialog** for structured preferences: diet (veg/non-veg), meats (chicken, mutton, pork, beef, seafood — only for non-veg), drinks (beer, wine, whisky, vodka, gin, rum, cocktails, non-drinker). Modal shows live summary and saves to server immediately. Passes `selectedPeople` + `preferences` forward.
+4. **Instructions** — Auto-generates instructions from preferences on first visit (e.g. "X is vegetarian", "Y doesn't eat pork or beef", "Z doesn't drink", "W drinks beer and wine"). Shows people tags and preference summary as reference. Users can edit/remove auto-generated instructions, add free text, or use quick-add example buttons (preference-aware — only shows relevant examples based on actual preferences). **@ autocomplete**: type `@` in the textarea to get a dropdown of matching people names; navigate with arrow keys, select with Enter/Tab, dismiss with Escape. Clear all button to start fresh. On back-nav, restores user's edited list (no re-generation).
 5. **Assign** — AI-suggested assignments as checkboxes (item -> people). Full manual override. Items can be shared among multiple people.
 6. **Split** — Per-person totals with itemised breakdown. Shows effective price per item (base + tax + SC).
 7. **Output** — Final per-person summary. WhatsApp-friendly text copy. Save session -> `data/history/`. Load past session from JSON upload.
@@ -79,6 +80,8 @@ Upload -> Review -> People -> Instructions -> Assign -> Split -> Output
 | POST | `/api/assign` | Items + instructions + preferences -> suggested assignments via Claude NLP |
 | GET | `/api/people` | Load master friends list |
 | POST | `/api/people` | Add new person to master list |
+| GET | `/api/preferences` | Load all structured preferences |
+| POST | `/api/preferences` | Update one person's preferences `{ name, prefs }` |
 | POST | `/api/save` | Save session to `data/history/establishment-YYYY-MM-DD.json` |
 | POST | `/api/load` | Load a history JSON -> repaint full session |
 
@@ -121,9 +124,15 @@ The Review screen shows a bill total reconciliation — the calculated total sho
 
 ### data/preferences.json
 ```json
-{ "Aakarsh": ["gin", "beer", "margherita"] }
+{
+  "Aakarsh": {
+    "diet": "non-veg",
+    "meats": ["chicken", "mutton"],
+    "drinks": ["beer", "whisky"]
+  }
+}
 ```
-Updated after each saved session based on assignments.
+Structured preferences: `diet` (veg/non-veg), `meats` (array, only for non-veg), `drinks` (array, empty = non-drinker). Edited in Screen 3 and auto-updated by Screen 7 on save (learning system — assignments inform future preferences).
 
 ### data/history/establishment-YYYY-MM-DD.json
 Must contain everything to fully repaint the session (all 7 screens): establishment, date, people, instructions, items, tax, serviceCharge, assignments, splits.
@@ -145,9 +154,8 @@ Must contain everything to fully repaint the session (all 7 screens): establishm
 - [x] Stepper navigation with back-nav support
 - [x] Screen 1 — Upload (drag & drop, file picker, preview, JSON test mode)
 - [x] Screen 2 — Review (AI parse, editable table, food/alcohol, tax/SC, bill reconciliation)
-- [x] Screen 3 — People (selectable chips, add person, GET/POST `/api/people`)
-- [ ] Screen 4 — Instructions (frontend only)
+- [x] Screen 3 — People (selectable chips, add person, structured preferences editor)
+- [x] Screen 4 — Instructions (free text hints, preference-aware examples)
 - [ ] Screen 5 — Assign (frontend + `/api/assign`)
 - [ ] Screen 6 — Split (frontend, pure calculation)
-- [ ] Screen 7 — Output + save/load (`/api/save`, `/api/load`)
-- [ ] Preference learning (update `preferences.json` on save)
+- [ ] Screen 7 — Output + save/load + preference learning (`/api/save`, `/api/load`)

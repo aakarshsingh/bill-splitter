@@ -8,6 +8,8 @@ A local bill splitting app. Upload a restaurant bill image/PDF, let AI parse it,
 - Food vs alcohol tax handling (Indian GST rules)
 - Service charge + tax applied in correct order
 - Bill total reconciliation
+- Structured user preferences (diet, meats, drinks) with learning across sessions
+- Test mode — upload a JSON file to skip AI calls during development
 - 7-step wizard: Upload → Review → People → Instructions → Assign → Split → Output
 
 ## Tech Stack

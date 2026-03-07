@@ -36,6 +36,11 @@
   margin-bottom: 20px;
 }
 
+.chipWrap {
+  position: relative;
+  display: inline-flex;
+}
+
 .chip {
   padding: 8px 16px;
   border: 2px solid #ddd;
@@ -55,6 +60,25 @@
   background: #e3f2fd;
   color: #1565c0;
   font-weight: 600;
+  padding-right: 28px;
+}
+
+.editBtn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #90b4d9;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px;
+  line-height: 1;
+}
+
+.editBtn:hover {
+  color: #1565c0;
 }
 
 .empty {
@@ -134,4 +158,137 @@
   text-align: center;
   padding: 40px;
   color: #666;
+}
+
+/* Modal overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.modalClose:hover {
+  color: #333;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.prefGroup {
+  margin-bottom: 16px;
+}
+
+.prefGroup:last-of-type {
+  margin-bottom: 12px;
+}
+
+.prefLabel {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.prefOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.optionChip {
+  padding: 6px 14px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: #fff;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: capitalize;
+}
+
+.optionChip:hover {
+  border-color: #aaa;
+}
+
+.optionActive {
+  border-color: #4a90d9;
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.vegChip.optionActive {
+  border-color: #4caf50;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.nonvegChip.optionActive {
+  border-color: #e65100;
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.prefSummaryLine {
+  font-size: 12px;
+  color: #999;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.modalDone {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 0 20px 20px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.modalDone:hover {
+  background: #3a7bc8;
 }
