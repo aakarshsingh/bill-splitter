@@ -14,7 +14,7 @@ export default function People({ initialSelected, onConfirm }) {
         if (!res.ok) throw new Error('Failed to load people');
         return res.json();
       })
-      .then((data) => setPeople(data))
+      .then((data) => setPeople(data.sort((a, b) => a.name.localeCompare(b.name))))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -45,7 +45,7 @@ export default function People({ initialSelected, onConfirm }) {
       });
       if (!res.ok) throw new Error('Failed to add person');
       const person = await res.json();
-      setPeople((prev) => [...prev, person]);
+      setPeople((prev) => [...prev, person].sort((a, b) => a.name.localeCompare(b.name)));
       setSelected((prev) => [...prev, person]);
       setNewName('');
     } catch (err) {
@@ -68,6 +68,13 @@ export default function People({ initialSelected, onConfirm }) {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Who's splitting?</h2>
+
+      {people.length > 0 && (
+        <div className={styles.quickActions}>
+          <button className={styles.quickBtn} onClick={() => setSelected([...people])}>Select All</button>
+          <button className={styles.quickBtn} onClick={() => setSelected([])}>Select None</button>
+        </div>
+      )}
 
       <div className={styles.chips}>
         {people.map((person) => (

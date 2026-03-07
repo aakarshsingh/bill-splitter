@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Review.module.css';
 
-function calcEffective(item, tax, serviceCharge) {
+function calcItemBreakdown(item, tax, serviceCharge) {
   const base = item.unitPrice * item.qty;
   const sc = serviceCharge / 100;
   const t = tax / 100;
+  const scAmount = base * sc;
   if (item.category === 'alcohol') {
     // Tax only on SC portion, not on alcohol itself
-    return base * (1 + sc * (1 + t));
+    const taxAmount = scAmount * t;
+    return { base, scAmount, taxAmount, effective: base + scAmount + taxAmount };
   }
   // Food: SC first, then tax on (cost + SC)
-  return base * (1 + sc) * (1 + t);
+  const taxAmount = (base + scAmount) * t;
+  return { base, scAmount, taxAmount, effective: base + scAmount + taxAmount };
 }
 
 function calcTotal(items, tax, serviceCharge) {
-  return items.reduce((sum, item) => sum + calcEffective(item, tax, serviceCharge), 0);
+  return items.reduce((sum, item) => sum + calcItemBreakdown(item, tax, serviceCharge).effective, 0);
 }
 
 export default function Review({ file, previewUrl, initialData, onConfirm }) {
@@ -134,67 +137,72 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
                 <th>Type</th>
                 <th>Qty</th>
                 <th>Unit Price</th>
+                <th>SC</th>
+                <th>Tax</th>
                 <th>Effective</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <input
-                      type="text"
-                      value={item.name}
-                      onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                      className={styles.nameInput}
-                    />
-                  </td>
-                  <td>
-                    <select
-                      value={item.category}
-                      onChange={(e) => updateItem(item.id, 'category', e.target.value)}
-                      className={styles.categorySelect}
-                    >
-                      <option value="food">Food</option>
-                      <option value="alcohol">Alcohol</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.qty}
-                      onChange={(e) =>
-                        updateItem(item.id, 'qty', parseInt(e.target.value) || 1)
-                      }
-                      className={styles.qtyInput}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formatPrice(item.unitPrice)}
-                      onChange={(e) =>
-                        updateItem(item.id, 'unitPrice', parsePriceInput(e.target.value))
-                      }
-                      className={styles.priceInput}
-                    />
-                  </td>
-                  <td className={styles.lineTotal}>
-                    {formatPrice(calcEffective(item, tax, serviceCharge))}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className={styles.removeBtn}
-                    >
-                      x
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {items.map((item) => {
+                const bd = calcItemBreakdown(item, tax, serviceCharge);
+                return (
+                  <tr key={item.id}>
+                    <td>
+                      <input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                        className={styles.nameInput}
+                      />
+                    </td>
+                    <td>
+                      <select
+                        value={item.category}
+                        onChange={(e) => updateItem(item.id, 'category', e.target.value)}
+                        className={styles.categorySelect}
+                      >
+                        <option value="food">Food</option>
+                        <option value="alcohol">Alcohol</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.qty}
+                        onChange={(e) =>
+                          updateItem(item.id, 'qty', parseInt(e.target.value) || 1)
+                        }
+                        className={styles.qtyInput}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formatPrice(item.unitPrice)}
+                        onChange={(e) =>
+                          updateItem(item.id, 'unitPrice', parsePriceInput(e.target.value))
+                        }
+                        className={styles.priceInput}
+                      />
+                    </td>
+                    <td className={styles.calcCol}>{formatPrice(bd.scAmount)}</td>
+                    <td className={styles.calcCol}>{formatPrice(bd.taxAmount)}</td>
+                    <td className={styles.lineTotal}>{formatPrice(bd.effective)}</td>
+                    <td>
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className={styles.removeBtn}
+                      >
+                        x
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 

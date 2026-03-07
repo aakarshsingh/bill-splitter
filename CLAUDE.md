@@ -64,8 +64,8 @@ Upload -> Review -> People -> Instructions -> Assign -> Split -> Output
 ```
 
 1. **Upload** — Drag & drop or file picker for image/PDF. Preview uploaded file. On confirm -> advance to Review. Accepts `initialFile`/`initialPreviewUrl` to restore on back-nav.
-2. **Review** — Calls `/api/parse` on first visit (skips if `initialData` present from back-nav). Editable table with item name, type (food/alcohol), qty, unit price, effective price. Tax/GST % and SC % with manual override. Side-by-side bill preview. Bill total reconciliation with match/mismatch indicator.
-3. **People** — Load from `data/people.json` as selectable chips. Can add new person (saves back). Selected people carry forward.
+2. **Review** — Calls `/api/parse` on first visit (skips if `initialData` present from back-nav or JSON test file). Editable table with item name, type (food/alcohol), qty, unit price, SC amount, tax amount, effective price. Tax/GST % and SC % with manual override. Side-by-side bill preview. Bill total reconciliation with match/mismatch indicator.
+3. **People** — Load from `data/people.json` as selectable chips (sorted alphabetically). Select All / Select None buttons. Can add new person (saves back, auto-selected). Selected people carry forward.
 4. **Instructions** — Free text for natural language assignment hints (e.g. "Split pizza between A, B and C", "A had all the beers"). Multiple instructions allowed. On confirm -> call `/api/assign`.
 5. **Assign** — AI-suggested assignments as checkboxes (item -> people). Full manual override. Items can be shared among multiple people.
 6. **Split** — Per-person totals with itemised breakdown. Shows effective price per item (base + tax + SC).

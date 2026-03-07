@@ -112,10 +112,18 @@
   background: #fff;
 }
 
+.calcCol {
+  text-align: right;
+  font-size: 13px;
+  color: #888;
+  white-space: nowrap;
+}
+
 .lineTotal {
   text-align: right;
   font-size: 14px;
   color: #555;
+  font-weight: 600;
   white-space: nowrap;
 }
 
