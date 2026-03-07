@@ -80,38 +80,37 @@ export default function Assign({
   const [loading, setLoading] = useState(!initialAssignments);
   const [error, setError] = useState(null);
 
+  const fetchFromAI = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (isTestMode && testAssignments) {
+        setParts(partsFromAI(testAssignments, items, people));
+        setReasoning(testAssignments.reasoning || '');
+        return;
+      }
+      const res = await fetch('/api/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, people, instructions, preferences }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to get assignments');
+      }
+      const data = await res.json();
+      setParts(partsFromAI(data, items, people));
+      setReasoning(data.reasoning || '');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (initialAssignments) return;
-
-    if (isTestMode && testAssignments) {
-      setParts(partsFromAI(testAssignments, items, people));
-      setReasoning(testAssignments.reasoning || '');
-      setLoading(false);
-      return;
-    }
-
-    const fetchAssignments = async () => {
-      try {
-        const res = await fetch('/api/assign', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items, people, instructions, preferences }),
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || 'Failed to get assignments');
-        }
-        const data = await res.json();
-        setParts(partsFromAI(data, items, people));
-        setReasoning(data.reasoning || '');
-      } catch (err) {
-        setError(err.message);
-        setParts(buildEmptyParts(items, people));
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAssignments();
+    fetchFromAI();
   }, []);
 
   const increment = (itemId, personName) => {
@@ -222,6 +221,13 @@ export default function Assign({
         </button>
         <button className={styles.bulkBtn} onClick={clearAll}>
           Clear all
+        </button>
+        <button
+          className={styles.resuggestBtn}
+          onClick={fetchFromAI}
+          disabled={loading}
+        >
+          {loading ? 'Suggesting...' : 'Re-suggest with AI'}
         </button>
       </div>
 
