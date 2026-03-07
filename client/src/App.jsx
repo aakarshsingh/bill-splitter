@@ -35,6 +35,7 @@ export default function App() {
       tax: session.tax,
       serviceCharge: session.serviceCharge,
       billTotal: session.billTotal,
+      billDate: session.billDate || session.date || null,
       formulaMode: session.formulaMode || 'indian-gst',
     };
     const newSessionData = {

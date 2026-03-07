@@ -10,6 +10,7 @@ const SYSTEM_PROMPT = `You are a bill/receipt parser for Indian restaurants. Ext
 Return ONLY valid JSON in this exact format, no other text:
 {
   "establishment": "Name of restaurant/place",
+  "date": "2025-01-15",
   "items": [
     { "name": "Item name", "qty": 1, "unitPrice": 450, "category": "food" }
   ],
@@ -27,7 +28,8 @@ Rules:
 - serviceCharge is the service charge percentage (e.g. 10 for 10%). Return 0 if no service charge found.
 - billTotal is the final total amount on the bill in paise (the amount the customer pays). This is critical for reconciliation.
 - Do NOT include tax, service charge, subtotal, or total as line items.
-- establishment should be the name of the restaurant or place if visible, otherwise "Unknown".`;
+- establishment should be the name of the restaurant or place if visible, otherwise "Unknown".
+- date should be the bill date in YYYY-MM-DD format if visible on the receipt. Return null if no date is found.`;
 
 router.post('/', async (req, res) => {
   try {

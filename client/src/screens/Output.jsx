@@ -47,7 +47,7 @@ export default function Output({ sessionData }) {
     historyFilename,
   } = sessionData;
 
-  const { items, tax, serviceCharge, establishment } = reviewData || {};
+  const { items, tax, serviceCharge, establishment, billDate } = reviewData || {};
 
   const [saving, setSaving] = useState(false);
   const [saveResult, setSaveResult] = useState(null);
@@ -94,7 +94,8 @@ export default function Output({ sessionData }) {
     try {
       const session = {
         establishment,
-        date: new Date().toISOString().slice(0, 10),
+        date: billDate || new Date().toISOString().slice(0, 10),
+        billDate: billDate || null,
         items,
         tax,
         serviceCharge,
@@ -265,7 +266,11 @@ export default function Output({ sessionData }) {
       <div ref={exportRef} className={styles.exportArea} style={{ display: 'none' }}>
         <div className={styles.exportHeader}>
           {establishment && <div className={styles.exportEstablishment}>{establishment}</div>}
-          <div className={styles.exportDate}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          <div className={styles.exportDate}>{
+            billDate
+              ? new Date(billDate + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+              : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+          }</div>
         </div>
         <table className={styles.summaryTable}>
           <thead>

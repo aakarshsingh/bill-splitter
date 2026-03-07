@@ -9,6 +9,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
   const [tax, setTax] = useState(hasInitial ? initialData.tax : 0);
   const [serviceCharge, setServiceCharge] = useState(hasInitial ? initialData.serviceCharge : 0);
   const [billTotal, setBillTotal] = useState(hasInitial ? initialData.billTotal : 0);
+  const [billDate, setBillDate] = useState(hasInitial ? initialData.billDate || null : null);
   const [testAssignments, setTestAssignments] = useState(hasInitial ? initialData.testAssignments || null : null);
   const [formulaMode, setFormulaMode] = useState(hasInitial ? initialData.formulaMode || 'indian-gst' : 'indian-gst');
   const [loading, setLoading] = useState(!hasInitial);
@@ -44,6 +45,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
         setTax(data.tax || 0);
         setServiceCharge(data.serviceCharge || 0);
         setBillTotal(data.billTotal || 0);
+        if (data.date) setBillDate(data.date);
         if (data.testAssignments) setTestAssignments(data.testAssignments);
       } catch (err) {
         setError(err.message);
@@ -287,7 +289,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
 
           <button
             onClick={() =>
-              onConfirm({ establishment, items, tax, serviceCharge, billTotal, testAssignments, formulaMode })
+              onConfirm({ establishment, items, tax, serviceCharge, billTotal, billDate, testAssignments, formulaMode })
             }
             className={styles.confirmBtn}
             disabled={items.length === 0}
