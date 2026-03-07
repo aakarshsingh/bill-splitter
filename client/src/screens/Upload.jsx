@@ -1,14 +1,25 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './Upload.module.css';
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/json'];
 
-export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
+export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLoadSession }) {
   const [file, setFile] = useState(initialFile || null);
   const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || null);
   const [error, setError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef();
+
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [loadingFile, setLoadingFile] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/load')
+      .then((r) => r.ok ? r.json() : [])
+      .then((files) => setHistory(files))
+      .catch(() => {});
+  }, []);
 
   const handleFile = useCallback((f) => {
     if (!ACCEPTED_TYPES.includes(f.type)) {
@@ -50,6 +61,28 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
     setPreviewUrl(null);
     setError(null);
     if (inputRef.current) inputRef.current.value = '';
+  };
+
+  const handleLoadSession = async (filename) => {
+    setLoadingFile(filename);
+    setError(null);
+    try {
+      const res = await fetch('/api/load', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to load session');
+      }
+      const session = await res.json();
+      onLoadSession(session);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingFile(null);
+    }
   };
 
   const isJson = file && file.type === 'application/json';
@@ -118,6 +151,30 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
         </div>
       )}
       {error && <p className={styles.error}>{error}</p>}
+
+      {history.length > 0 && !file && (
+        <div className={styles.historySection}>
+          <h3 className={styles.historyTitle}>Past Sessions</h3>
+          <div className={styles.historyList}>
+            {history.map((filename) => {
+              const display = filename.replace('.json', '').replace(/-/g, ' ');
+              return (
+                <button
+                  key={filename}
+                  className={styles.historyItem}
+                  onClick={() => handleLoadSession(filename)}
+                  disabled={!!loadingFile}
+                >
+                  <span className={styles.historyName}>{display}</span>
+                  {loadingFile === filename && (
+                    <span className={styles.historyLoading}>Loading...</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

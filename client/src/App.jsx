@@ -4,6 +4,8 @@ import Review from './screens/Review';
 import People from './screens/People';
 import Instructions from './screens/Instructions';
 import Assign from './screens/Assign';
+import Split from './screens/Split';
+import Output from './screens/Output';
 import styles from './App.module.css';
 
 const STEP_LABELS = ['Upload', 'Review', 'People', 'Instructions', 'Assign', 'Split', 'Output'];
@@ -24,6 +26,36 @@ export default function App() {
   const advance = (step) => {
     setScreen(step);
     setMaxStep((prev) => Math.max(prev, step));
+  };
+
+  const loadSession = (session) => {
+    const reviewData = {
+      establishment: session.establishment,
+      items: session.items,
+      tax: session.tax,
+      serviceCharge: session.serviceCharge,
+      billTotal: session.billTotal,
+    };
+    const newSessionData = {
+      reviewData,
+      selectedPeople: session.people,
+      preferences: session.preferences || {},
+      instructions: session.instructions || [],
+      assignments: session.assignments || {},
+      splitData: session.splitData || null,
+    };
+    setSessionData(newSessionData);
+    // Jump to the furthest screen that has data
+    if (session.splitData) {
+      setScreen(7);
+      setMaxStep(7);
+    } else if (session.assignments && Object.keys(session.assignments).length > 0) {
+      setScreen(6);
+      setMaxStep(6);
+    } else {
+      setScreen(2);
+      setMaxStep(2);
+    }
   };
 
   return (
@@ -59,6 +91,7 @@ export default function App() {
               updateSession({ file, previewUrl });
               advance(2);
             }}
+            onLoadSession={loadSession}
           />
         )}
         {screen === 2 && (
@@ -110,7 +143,18 @@ export default function App() {
           />
         )}
         {screen === 6 && (
-          <p>Screen 6 — Split (not yet implemented)</p>
+          <Split
+            reviewData={sessionData.reviewData || { items: [], tax: 0, serviceCharge: 0 }}
+            people={sessionData.selectedPeople || []}
+            assignments={sessionData.assignments || {}}
+            onConfirm={(splitData) => {
+              updateSession({ splitData });
+              advance(7);
+            }}
+          />
+        )}
+        {screen === 7 && (
+          <Output sessionData={sessionData} />
         )}
       </main>
     </div>

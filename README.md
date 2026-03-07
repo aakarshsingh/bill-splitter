@@ -5,19 +5,25 @@ A local bill splitting app. Upload a restaurant bill image/PDF, let AI parse it,
 ## Features
 
 - AI-powered bill parsing via Claude Vision
+- AI-suggested item assignments based on preferences and instructions
 - Food vs alcohol tax handling (Indian GST rules)
 - Service charge + tax applied in correct order
 - Bill total reconciliation
-- Structured user preferences (diet, meats, drinks) with learning across sessions
+- Structured user preferences (diet, meats, drinks) with automatic learning across sessions
+- Preference-aware auto-generated instructions and bill-aware quick-add examples
+- +/- proportional share buttons for intuitive item assignment
+- Per-person split with itemised breakdown
+- WhatsApp-friendly summary copy
+- Save/load past sessions
 - Test mode — upload a JSON file to skip AI calls during development
 - 7-step wizard: Upload → Review → People → Instructions → Assign → Split → Output
 
 ## Tech Stack
 
-- **Frontend:** React
+- **Frontend:** React (CSS Modules, no frameworks)
 - **Backend:** Node.js + Express
-- **AI:** Claude API (`claude-sonnet-4-20250514`)
-- **Storage:** Local JSON files
+- **AI:** Claude API (`claude-sonnet-4-20250514`) for bill parsing and assignment suggestions
+- **Storage:** Local JSON files (`data/` directory)
 
 ## Setup
 
@@ -26,7 +32,7 @@ npm install
 cd client && npm install && cd ..
 ```
 
-Create a `.env` file in the project root:
+Create a `.env` file in `server/`:
 
 ```
 ANTHROPIC_API_KEY=your-api-key-here
@@ -39,3 +45,7 @@ npm start
 ```
 
 Opens the React app on `http://localhost:3000` with the Express server on port 3001.
+
+## Test Mode
+
+Upload `data/test-bill.json` (or any `.json` matching the parse output schema) to skip all AI API calls. Includes sample items and pre-built assignments.
