@@ -3,9 +3,9 @@ import styles from './Upload.module.css';
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
 
-export default function Upload({ onConfirm }) {
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
+  const [file, setFile] = useState(initialFile || null);
+  const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || null);
   const [error, setError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef();
