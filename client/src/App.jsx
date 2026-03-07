@@ -3,6 +3,7 @@ import Upload from './screens/Upload';
 import Review from './screens/Review';
 import People from './screens/People';
 import Instructions from './screens/Instructions';
+import Assign from './screens/Assign';
 import styles from './App.module.css';
 
 const STEP_LABELS = ['Upload', 'Review', 'People', 'Instructions', 'Assign', 'Split', 'Output'];
@@ -85,6 +86,7 @@ export default function App() {
           <Instructions
             people={sessionData.selectedPeople || []}
             preferences={sessionData.preferences || {}}
+            items={sessionData.reviewData?.items || []}
             initialInstructions={sessionData.instructions}
             onConfirm={(instructions) => {
               updateSession({ instructions });
@@ -93,7 +95,22 @@ export default function App() {
           />
         )}
         {screen === 5 && (
-          <p>Screen 5 — Assign (not yet implemented)</p>
+          <Assign
+            reviewData={sessionData.reviewData || { items: [], tax: 0, serviceCharge: 0 }}
+            people={sessionData.selectedPeople || []}
+            preferences={sessionData.preferences || {}}
+            instructions={sessionData.instructions || []}
+            initialAssignments={sessionData.assignments}
+            isTestMode={sessionData.file?.type === 'application/json'}
+            testAssignments={sessionData.reviewData?.testAssignments}
+            onConfirm={(assignments) => {
+              updateSession({ assignments });
+              advance(6);
+            }}
+          />
+        )}
+        {screen === 6 && (
+          <p>Screen 6 — Split (not yet implemented)</p>
         )}
       </main>
     </div>

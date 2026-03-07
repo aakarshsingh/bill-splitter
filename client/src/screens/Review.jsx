@@ -27,6 +27,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
   const [tax, setTax] = useState(hasInitial ? initialData.tax : 0);
   const [serviceCharge, setServiceCharge] = useState(hasInitial ? initialData.serviceCharge : 0);
   const [billTotal, setBillTotal] = useState(hasInitial ? initialData.billTotal : 0);
+  const [testAssignments, setTestAssignments] = useState(hasInitial ? initialData.testAssignments || null : null);
   const [loading, setLoading] = useState(!hasInitial);
   const [error, setError] = useState(null);
 
@@ -60,6 +61,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
         setTax(data.tax || 0);
         setServiceCharge(data.serviceCharge || 0);
         setBillTotal(data.billTotal || 0);
+        if (data.testAssignments) setTestAssignments(data.testAssignments);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -286,7 +288,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
 
           <button
             onClick={() =>
-              onConfirm({ establishment, items, tax, serviceCharge, billTotal })
+              onConfirm({ establishment, items, tax, serviceCharge, billTotal, testAssignments })
             }
             className={styles.confirmBtn}
             disabled={items.length === 0}

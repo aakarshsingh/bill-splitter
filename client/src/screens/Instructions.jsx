@@ -47,48 +47,62 @@ function generateAutoInstructions(people, preferences) {
   return auto;
 }
 
-function generateExamples(people, preferences) {
+function generateExamples(people, preferences, items) {
   const names = people.map((p) => p.name);
   if (names.length === 0) return [];
   const examples = [];
 
-  // Split example
-  if (names.length >= 3) {
-    examples.push(`Split pizza between ${names[0]}, ${names[1]} and ${names[2]}`);
-  } else if (names.length >= 2) {
-    examples.push(`Split pizza between ${names[0]} and ${names[1]}`);
+  const alcoholItems = (items || []).filter((i) => i.category === 'alcohol');
+  const foodItems = (items || []).filter((i) => i.category === 'food');
+
+  // Split example using an actual food item
+  const splitItem = foodItems.length > 0 ? foodItems[0].name : null;
+  if (splitItem) {
+    if (names.length >= 3) {
+      examples.push(`Split ${splitItem} between ${names[0]}, ${names[1]} and ${names[2]}`);
+    } else if (names.length >= 2) {
+      examples.push(`Split ${splitItem} between ${names[0]} and ${names[1]}`);
+    }
   }
 
-  // Preference-aware drink examples
+  // Drink examples — only if matching alcohol items exist on the bill
   for (const person of people) {
     const pref = preferences[person.name];
-    if (pref && pref.drinks && pref.drinks.length > 0) {
-      examples.push(`${person.name} had all the ${pref.drinks[0]}`);
-      if (pref.drinks.length > 1) {
-        examples.push(`${person.name} only had ${pref.drinks[1]}`);
+    if (!pref || !pref.drinks || pref.drinks.length === 0) continue;
+    for (const drink of pref.drinks) {
+      const match = alcoholItems.find((i) => i.name.toLowerCase().includes(drink.toLowerCase()));
+      if (match) {
+        examples.push(`${person.name} had all the ${match.name}`);
+        break;
       }
-      break;
     }
+    if (examples.length > 1) break;
   }
 
-  // Preference-aware meat example
+  // Meat example — only if matching food items exist on the bill
   for (const person of people) {
     const pref = preferences[person.name];
-    if (pref && pref.meats && pref.meats.length > 0) {
-      examples.push(`${person.name} had the ${pref.meats[0]} dishes`);
-      break;
+    if (!pref || !pref.meats || pref.meats.length === 0) continue;
+    for (const meat of pref.meats) {
+      const match = foodItems.find((i) => i.name.toLowerCase().includes(meat.toLowerCase()));
+      if (match) {
+        examples.push(`${person.name} had the ${match.name}`);
+        break;
+      }
     }
+    if (examples.length > 2) break;
   }
 
-  // Shared items
-  if (names.length >= 2) {
-    examples.push(`Everyone shared the appetizers`);
+  // Shared items — pick an actual item
+  if (names.length >= 2 && foodItems.length > 1) {
+    const sharedItem = foodItems[foodItems.length - 1].name;
+    examples.push(`Everyone shared the ${sharedItem}`);
   }
 
   return examples;
 }
 
-export default function Instructions({ people, preferences, initialInstructions, onConfirm }) {
+export default function Instructions({ people, preferences, items, initialInstructions, onConfirm }) {
   const autoInstructions = generateAutoInstructions(people, preferences);
   const startingInstructions = initialInstructions || (autoInstructions.length > 0 ? autoInstructions : []);
 
@@ -98,7 +112,7 @@ export default function Instructions({ people, preferences, initialInstructions,
   const [mentionIdx, setMentionIdx] = useState(0); // highlighted index in dropdown
   const textareaRef = useRef(null);
 
-  const examples = generateExamples(people, preferences);
+  const examples = generateExamples(people, preferences, items);
 
   const mentionMatches = mention
     ? people
