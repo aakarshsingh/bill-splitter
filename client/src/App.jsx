@@ -65,6 +65,7 @@ export default function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <h1>Bill Splitter</h1>
+        <span className={styles.byline}>by Aakarsh</span>
       </header>
       <nav className={styles.stepper}>
         {STEP_LABELS.map((label, i) => {
