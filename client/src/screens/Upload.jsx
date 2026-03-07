@@ -77,7 +77,7 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
         throw new Error(err.error || 'Failed to load session');
       }
       const session = await res.json();
-      onLoadSession(session);
+      onLoadSession(session, filename);
     } catch (err) {
       setError(err.message);
     } finally {

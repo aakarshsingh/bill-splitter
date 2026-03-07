@@ -43,6 +43,7 @@ export default function Output({ sessionData }) {
     instructions,
     assignments,
     splitData,
+    historyFilename,
   } = sessionData;
 
   const { items, tax, serviceCharge, establishment } = reviewData || {};
@@ -105,7 +106,7 @@ export default function Output({ sessionData }) {
       const res = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session }),
+        body: JSON.stringify({ session, overwriteFilename: historyFilename || null }),
       });
       if (!res.ok) {
         const err = await res.json();

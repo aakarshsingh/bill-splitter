@@ -89,7 +89,7 @@ function learnPreferences(session) {
 
 router.post('/', (req, res) => {
   try {
-    const { session } = req.body;
+    const { session, overwriteFilename } = req.body;
     if (!session) {
       return res.status(400).json({ error: 'session data is required' });
     }
@@ -98,19 +98,29 @@ router.post('/', (req, res) => {
       fs.mkdirSync(HISTORY_DIR, { recursive: true });
     }
 
-    const establishment = (session.establishment || 'unknown')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-    const date = new Date().toISOString().slice(0, 10);
-    let filename = `${establishment}-${date}.json`;
+    let filename;
+    let filepath;
 
-    let filepath = path.join(HISTORY_DIR, filename);
-    let counter = 1;
-    while (fs.existsSync(filepath)) {
-      filename = `${establishment}-${date}-${counter}.json`;
+    if (overwriteFilename) {
+      // Overwrite existing history file (loaded session)
+      filename = path.basename(overwriteFilename);
       filepath = path.join(HISTORY_DIR, filename);
-      counter++;
+    } else {
+      // Generate new filename
+      const establishment = (session.establishment || 'unknown')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      const date = new Date().toISOString().slice(0, 10);
+      filename = `${establishment}-${date}.json`;
+
+      filepath = path.join(HISTORY_DIR, filename);
+      let counter = 1;
+      while (fs.existsSync(filepath)) {
+        filename = `${establishment}-${date}-${counter}.json`;
+        filepath = path.join(HISTORY_DIR, filename);
+        counter++;
+      }
     }
 
     fs.writeFileSync(filepath, JSON.stringify(session, null, 2));

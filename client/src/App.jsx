@@ -28,7 +28,7 @@ export default function App() {
     setMaxStep((prev) => Math.max(prev, step));
   };
 
-  const loadSession = (session) => {
+  const loadSession = (session, historyFilename) => {
     const reviewData = {
       establishment: session.establishment,
       items: session.items,
@@ -44,6 +44,7 @@ export default function App() {
       instructions: session.instructions || [],
       assignments: session.assignments || {},
       splitData: session.splitData || null,
+      historyFilename: historyFilename || null,
     };
     setSessionData(newSessionData);
     // Jump to the furthest screen that has data
