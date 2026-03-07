@@ -1,0 +1,116 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0 0 20px;
+  font-size: 20px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.chip {
+  padding: 8px 16px;
+  border: 2px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  border-color: #aaa;
+}
+
+.chipSelected {
+  border-color: #4a90d9;
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.empty {
+  color: #999;
+  font-size: 14px;
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.addInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.addBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background: #3a7bc8;
+}
+
+.addBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #d44;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.selectedSummary {
+  padding: 12px 0;
+  font-size: 14px;
+  color: #555;
+  border-top: 1px solid #eee;
+  margin-bottom: 16px;
+}
+
+.confirmBtn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.confirmBtn:hover {
+  background: #3a7bc8;
+}
+
+.confirmBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}

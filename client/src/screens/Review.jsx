@@ -31,19 +31,27 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
 
   useEffect(() => {
     if (hasInitial) return;
-    const parseFile = async () => {
+    const isTestJson = file && file.type === 'application/json';
+
+    const loadData = async () => {
       try {
-        const base64 = await fileToBase64(file);
-        const res = await fetch('/api/parse', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fileData: base64, mimeType: file.type }),
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || 'Failed to parse bill');
+        let data;
+        if (isTestJson) {
+          const text = await file.text();
+          data = JSON.parse(text);
+        } else {
+          const base64 = await fileToBase64(file);
+          const res = await fetch('/api/parse', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileData: base64, mimeType: file.type }),
+          });
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Failed to parse bill');
+          }
+          data = await res.json();
         }
-        const data = await res.json();
         setEstablishment(data.establishment || '');
         setItems(data.items || []);
         setTax(data.tax || 0);
@@ -55,7 +63,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
         setLoading(false);
       }
     };
-    parseFile();
+    loadData();
   }, [file, hasInitial]);
 
   const updateItem = (id, field, value) => {
@@ -279,22 +287,24 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
           </button>
         </div>
 
-        <div className={styles.previewSection}>
-          <h3>Bill Preview</h3>
-          {isPdf ? (
-            <iframe
-              src={previewUrl}
-              title="Bill preview"
-              className={styles.pdfPreview}
-            />
-          ) : (
-            <img
-              src={previewUrl}
-              alt="Bill preview"
-              className={styles.imagePreview}
-            />
-          )}
-        </div>
+        {previewUrl && (
+          <div className={styles.previewSection}>
+            <h3>Bill Preview</h3>
+            {isPdf ? (
+              <iframe
+                src={previewUrl}
+                title="Bill preview"
+                className={styles.pdfPreview}
+              />
+            ) : (
+              <img
+                src={previewUrl}
+                alt="Bill preview"
+                className={styles.imagePreview}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

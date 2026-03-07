@@ -108,6 +108,24 @@
   border: none;
 }
 
+.testBadge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: #fff3e0;
+  color: #e65100;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.jsonPreview {
+  padding: 40px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
 .confirmBtn {
   display: block;
   width: 100%;

@@ -1,0 +1,16 @@
+{
+  "establishment": "Test Restaurant",
+  "items": [
+    { "id": "t1", "name": "Margherita Pizza", "qty": 1, "unitPrice": 45000, "category": "food" },
+    { "id": "t2", "name": "Pasta Carbonara", "qty": 1, "unitPrice": 35000, "category": "food" },
+    { "id": "t3", "name": "Caesar Salad", "qty": 1, "unitPrice": 25000, "category": "food" },
+    { "id": "t4", "name": "Kingfisher Beer", "qty": 2, "unitPrice": 30000, "category": "alcohol" },
+    { "id": "t5", "name": "Gin & Tonic", "qty": 1, "unitPrice": 45000, "category": "alcohol" },
+    { "id": "t6", "name": "Butter Chicken", "qty": 1, "unitPrice": 42000, "category": "food" },
+    { "id": "t7", "name": "Garlic Naan", "qty": 3, "unitPrice": 8000, "category": "food" },
+    { "id": "t8", "name": "Mojito (Non-Alc)", "qty": 1, "unitPrice": 20000, "category": "food" }
+  ],
+  "tax": 5,
+  "serviceCharge": 10,
+  "billTotal": 380100
+}

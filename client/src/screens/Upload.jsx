@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styles from './Upload.module.css';
 
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/json'];
 
 export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
   const [file, setFile] = useState(initialFile || null);
@@ -12,12 +12,16 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
 
   const handleFile = useCallback((f) => {
     if (!ACCEPTED_TYPES.includes(f.type)) {
-      setError('Please upload a JPG, PNG, or PDF file.');
+      setError('Please upload a JPG, PNG, PDF, or JSON file.');
       return;
     }
     setError(null);
     setFile(f);
-    setPreviewUrl(URL.createObjectURL(f));
+    if (f.type !== 'application/json') {
+      setPreviewUrl(URL.createObjectURL(f));
+    } else {
+      setPreviewUrl(null);
+    }
   }, []);
 
   const handleDrop = useCallback((e) => {
@@ -48,6 +52,7 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
     if (inputRef.current) inputRef.current.value = '';
   };
 
+  const isJson = file && file.type === 'application/json';
   const isPdf = file && file.type === 'application/pdf';
 
   return (
@@ -64,12 +69,12 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
             <span className={styles.icon}>+</span>
             <p>Drag & drop your bill here</p>
             <p className={styles.hint}>or click to browse</p>
-            <p className={styles.formats}>JPG, PNG, or PDF</p>
+            <p className={styles.formats}>JPG, PNG, PDF, or JSON (test mode)</p>
           </div>
           <input
             ref={inputRef}
             type="file"
-            accept=".jpg,.jpeg,.png,.pdf"
+            accept=".jpg,.jpeg,.png,.pdf,.json"
             onChange={handleInputChange}
             className={styles.hiddenInput}
           />
@@ -77,13 +82,20 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
       ) : (
         <div className={styles.preview}>
           <div className={styles.previewHeader}>
-            <span className={styles.filename}>{file.name}</span>
+            <span className={styles.filename}>
+              {file.name}
+              {isJson && <span className={styles.testBadge}>TEST MODE</span>}
+            </span>
             <button onClick={handleRemove} className={styles.removeBtn}>
               Remove
             </button>
           </div>
           <div className={styles.previewBody}>
-            {isPdf ? (
+            {isJson ? (
+              <div className={styles.jsonPreview}>
+                Test data file — will skip AI parsing
+              </div>
+            ) : isPdf ? (
               <iframe
                 src={previewUrl}
                 title="Bill preview"
@@ -101,7 +113,7 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
             onClick={() => onConfirm(file, previewUrl)}
             className={styles.confirmBtn}
           >
-            Confirm & Continue
+            {isJson ? 'Load Test Data' : 'Confirm & Continue'}
           </button>
         </div>
       )}

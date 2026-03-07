@@ -40,6 +40,7 @@ bill-splitter/
 ├── data/
 │   ├── people.json          # Master friends list
 │   ├── preferences.json     # Learned preferences per person
+│   ├── test-bill.json       # Sample parsed bill for test mode
 │   └── history/             # One file per session: place-date.json
 ├── CLAUDE.md
 └── package.json
@@ -50,6 +51,10 @@ bill-splitter/
 App uses a stepper nav bar at the top. Users can click back to any completed step without losing data. Session state is held in `App.jsx`'s `sessionData` object and passed as `initialData`/`initialFile` props so screens restore their state on revisit (no re-fetching APIs).
 
 Key props pattern: each screen receives its initial state from `sessionData` and calls `onConfirm(data)` to save back and advance.
+
+## Test Mode
+
+Upload a `.json` file instead of an image/PDF to skip all AI API calls. The Review screen reads the JSON directly as parsed bill data. Use `data/test-bill.json` as a sample (8 items, mix of food and alcohol, 5% tax, 10% SC). Test JSON must match the `/api/parse` output schema.
 
 ## Screen Flow
 
@@ -138,9 +143,9 @@ Must contain everything to fully repaint the session (all 7 screens): establishm
 
 - [x] Project scaffold + package.json files
 - [x] Stepper navigation with back-nav support
-- [x] Screen 1 — Upload (drag & drop, file picker, preview)
+- [x] Screen 1 — Upload (drag & drop, file picker, preview, JSON test mode)
 - [x] Screen 2 — Review (AI parse, editable table, food/alcohol, tax/SC, bill reconciliation)
-- [ ] Screen 3 — People (frontend + `/api/people`)
+- [x] Screen 3 — People (selectable chips, add person, GET/POST `/api/people`)
 - [ ] Screen 4 — Instructions (frontend only)
 - [ ] Screen 5 — Assign (frontend + `/api/assign`)
 - [ ] Screen 6 — Split (frontend, pure calculation)

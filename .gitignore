@@ -141,6 +141,7 @@ vite.config.ts.timestamp-*
 
 # personal data
 data/*
+!data/test-bill.json
 
 # build output
 client/build/

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Upload from './screens/Upload';
 import Review from './screens/Review';
+import People from './screens/People';
 import styles from './App.module.css';
 
 const STEP_LABELS = ['Upload', 'Review', 'People', 'Instructions', 'Assign', 'Split', 'Output'];
@@ -70,7 +71,16 @@ export default function App() {
           />
         )}
         {screen === 3 && (
-          <p>Screen 3 — People (not yet implemented)</p>
+          <People
+            initialSelected={sessionData.selectedPeople}
+            onConfirm={(selectedPeople) => {
+              updateSession({ selectedPeople });
+              advance(4);
+            }}
+          />
+        )}
+        {screen === 4 && (
+          <p>Screen 4 — Instructions (not yet implemented)</p>
         )}
       </main>
     </div>
