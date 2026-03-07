@@ -11,6 +11,7 @@ A local bill splitting app. Upload a restaurant bill image/PDF, let AI parse it,
 - Bill total reconciliation
 - Structured user preferences (diet, meats, drinks) with automatic learning across sessions
 - Preference-aware auto-generated instructions and bill-aware quick-add examples
+- `@` autocomplete for people, `#` autocomplete for items in instructions
 - +/- proportional share buttons with sticky header/column for large bills
 - Assignments persist when navigating back; explicit "Re-suggest with AI" button
 - Per-person split with itemised breakdown

@@ -13,8 +13,9 @@ router.get('/', (req, res) => {
     }
     const files = fs.readdirSync(HISTORY_DIR)
       .filter((f) => f.endsWith('.json'))
-      .sort()
-      .reverse();
+      .map((f) => ({ name: f, mtime: fs.statSync(path.join(HISTORY_DIR, f)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime)
+      .map((f) => f.name);
     res.json(files);
   } catch (err) {
     console.error('Load list error:', err);
