@@ -1,0 +1,430 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #eee;
+  border-top-color: #4a90d9;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  background: #fff5f5;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: #c33;
+  font-size: 14px;
+}
+
+.errorHint {
+  color: #888;
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.reasoning {
+  background: #f0f7ff;
+  border: 1px solid #d0e3f7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #555;
+}
+
+.reasoningLabel {
+  font-weight: 600;
+  color: #4a90d9;
+}
+
+.bulkActions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bulkBtn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bulkBtn:hover {
+  background: #f5f5f5;
+  border-color: #aaa;
+}
+
+.resuggestBtn {
+  padding: 4px 12px;
+  border: 1px solid #d0e3f7;
+  border-radius: 4px;
+  background: #f0f7ff;
+  color: #4a90d9;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.resuggestBtn:hover {
+  background: #d0e3f7;
+  border-color: #4a90d9;
+}
+
+.resuggestBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tableWrap {
+  overflow: auto;
+  margin-bottom: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  max-height: 70vh;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fafafa;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+  border-bottom: 2px solid #eee;
+  white-space: nowrap;
+}
+
+.table tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: #f5f5f5;
+}
+
+.table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+/* Sticky first column (item name) */
+.table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+.table tbody td:first-child,
+.table tfoot td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #fff;
+}
+
+.table tfoot td:first-child {
+  z-index: 3;
+}
+
+.rowUnassigned td:first-child {
+  background: #fffcf0;
+}
+
+.itemCol {
+  text-align: left !important;
+  min-width: 140px;
+  padding-left: 10px !important;
+}
+
+.effCol {
+  min-width: 80px;
+}
+
+.personCol {
+  min-width: 80px;
+  max-width: 110px;
+}
+
+.personName {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.actionsCol {
+  min-width: 60px;
+}
+
+.itemCell {
+  text-align: left;
+  padding-left: 10px !important;
+}
+
+.itemName {
+  display: block;
+  font-weight: 500;
+  color: #333;
+}
+
+.itemMeta {
+  display: block;
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.alcohol {
+  color: #e65100;
+}
+
+.effCell {
+  text-align: right;
+  font-family: monospace;
+  color: #555;
+  font-size: 12px;
+  padding-right: 8px !important;
+}
+
+.shareCell {
+  text-align: center;
+  padding: 4px 2px !important;
+}
+
+.shareBox {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.shareActive {
+  border-color: #90caf9;
+  background: #e3f2fd;
+}
+
+.shareBtn {
+  width: 26px;
+  height: 28px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.shareBtn:hover:not(:disabled) {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.shareActive .shareBtn:hover:not(:disabled) {
+  background: #bbdefb;
+  color: #1565c0;
+}
+
+.shareBtn:disabled {
+  color: #ddd;
+  cursor: default;
+}
+
+.shareCount {
+  min-width: 24px;
+  height: 28px;
+  border: none;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shareActive .shareCount {
+  background: #fff;
+  color: #1565c0;
+  border-color: #bbdefb;
+}
+
+.shareCount:hover {
+  background: #f0f0f0;
+}
+
+.shareFraction {
+  font-size: 10px;
+  color: #90a4ae;
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+.shareActive .shareFraction {
+  color: #4a90d9;
+}
+
+.shareAmount {
+  font-size: 10px;
+  color: #999;
+  font-family: monospace;
+}
+
+.shareActive .shareAmount {
+  color: #1565c0;
+}
+
+.actionsCell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.rowBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #888;
+  margin: 0 2px;
+}
+
+.rowBtn:hover {
+  border-color: #888;
+  color: #333;
+}
+
+.rowUnassigned {
+  background: #fffcf0;
+}
+
+.totalRow {
+  font-weight: 600;
+}
+
+.totalRow td {
+  padding: 10px 8px;
+  border-top: 2px solid #ddd;
+  border-bottom: none;
+  background: #f5f5f5;
+}
+
+.totalLabel {
+  text-align: left;
+  color: #333;
+  font-size: 13px;
+  padding-left: 10px !important;
+}
+
+.personTotal {
+  text-align: center;
+  font-family: monospace;
+  font-size: 13px;
+  color: #1565c0;
+}
+
+.warnings {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #e65100;
+}
+
+.warningsLabel {
+  font-weight: 600;
+}
+
+.warnings ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.warnings li {
+  margin: 2px 0;
+}
+
+.shareHelp {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.helpLabel {
+  font-weight: 600;
+  color: #666;
+}
+
+.confirmBtn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.confirmBtn:hover {
+  background: #3a7bc8;
+}
+
+.confirmBtn:disabled {
+  background: #e0a040;
+  cursor: not-allowed;
+}

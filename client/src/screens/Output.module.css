@@ -1,0 +1,334 @@
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.establishment {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+/* Summary table */
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.summaryTable thead th {
+  text-align: left;
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 8px 12px;
+  border-bottom: 2px solid #eee;
+  font-weight: 600;
+}
+
+.summaryTable thead th:nth-child(2),
+.summaryTable thead th:nth-child(3) {
+  text-align: right;
+}
+
+.summaryTable tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.personCell {
+  font-weight: 600;
+  color: #333;
+}
+
+.itemsCell {
+  text-align: right;
+  color: #888;
+}
+
+.amountCell {
+  text-align: right;
+  font-family: monospace;
+  font-weight: 600;
+  color: #1565c0;
+  font-size: 15px;
+}
+
+.totalLabel {
+  font-weight: 700;
+  color: #333;
+  padding: 12px !important;
+  border-top: 2px solid #ddd;
+  border-bottom: none !important;
+}
+
+.totalAmount {
+  text-align: right;
+  font-family: monospace;
+  font-weight: 700;
+  color: #1565c0;
+  font-size: 16px;
+  padding: 12px !important;
+  border-top: 2px solid #ddd;
+  border-bottom: none !important;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copyBtn {
+  background: #25d366;
+  color: #fff;
+}
+
+.copyBtn:hover {
+  background: #1fba59;
+}
+
+.saveBtn {
+  background: #4a90d9;
+  color: #fff;
+}
+
+.saveBtn:hover {
+  background: #3a7bc8;
+}
+
+.saveBtn:disabled {
+  background: #90b4d9;
+  cursor: default;
+}
+
+.exportBtn {
+  background: #7c4dff;
+  color: #fff;
+}
+
+.exportBtn:hover {
+  background: #651fff;
+}
+
+.exportBtn:disabled {
+  background: #b39ddb;
+  cursor: default;
+}
+
+.error {
+  background: #fff5f5;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #c33;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* WhatsApp preview */
+.previewSection {
+  margin-bottom: 24px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 14px;
+  background: #fafafa;
+  border: none;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  text-align: left;
+}
+
+.previewHeader:hover {
+  background: #f0f0f0;
+}
+
+.previewLabel {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.collapseIcon {
+  font-size: 10px;
+  color: #bbb;
+}
+
+.previewText {
+  padding: 14px 16px;
+  margin: 0;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background: #fff;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Detailed breakdown */
+.detailSection {
+  margin-bottom: 20px;
+}
+
+.detailToggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.detailToggle:hover .detailTitle {
+  color: #1565c0;
+}
+
+.detailTitle {
+  font-size: 16px;
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.personBlock {
+  margin-bottom: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.personHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.personName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.personTotal {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1565c0;
+}
+
+.detailTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.detailTable thead th {
+  text-align: left;
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 6px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 600;
+}
+
+.detailTable thead th:nth-child(2),
+.detailTable thead th:nth-child(3) {
+  text-align: right;
+}
+
+.detailTable tbody td {
+  padding: 6px 14px;
+  border-bottom: 1px solid #f8f8f8;
+}
+
+.detailItem {
+  color: #555;
+}
+
+.detailQty {
+  color: #999;
+  font-size: 12px;
+}
+
+.detailShare {
+  text-align: right;
+  font-family: monospace;
+  color: #4a90d9;
+  font-size: 12px;
+}
+
+.detailAmount {
+  text-align: right;
+  font-family: monospace;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Export area (hidden, rendered for html2canvas) */
+.exportArea {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 600px;
+  padding: 24px;
+  background: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.exportHeader {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #eee;
+}
+
+.exportEstablishment {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.exportDate {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+}

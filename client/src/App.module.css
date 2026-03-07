@@ -1,0 +1,107 @@
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  display: inline;
+}
+
+.byline {
+  font-size: 12px;
+  color: #bbb;
+  font-weight: 400;
+  margin-left: 8px;
+  letter-spacing: 0.3px;
+}
+
+.stepper {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  overflow-x: auto;
+}
+
+.stepBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fafafa;
+  color: #aaa;
+  cursor: default;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.stepBtn:not(:disabled) {
+  cursor: pointer;
+}
+
+.stepBtn:not(:disabled):hover {
+  background: #f0f0f0;
+}
+
+.stepBtn.completed {
+  background: #e8f5e9;
+  border-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.stepBtn.active {
+  background: #e3f2fd;
+  border-color: #4a90d9;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.stepNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  background: #e0e0e0;
+  color: #888;
+}
+
+.stepBtn.active .stepNum {
+  background: #4a90d9;
+  color: #fff;
+}
+
+.stepBtn.completed .stepNum {
+  background: #4caf50;
+  color: #fff;
+}
+
+.stepLabel {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .stepLabel {
+    display: inline;
+  }
+}
+
+.main {
+  min-height: 400px;
+}

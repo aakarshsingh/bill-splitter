@@ -138,5 +138,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+
 # personal data
-data/history/
+data/*
+!data/test-bill.json
+
+# build output
+client/build/
