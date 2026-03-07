@@ -90,8 +90,9 @@ Upload -> Review -> People -> Instructions -> Assign -> Split -> Output
 
 ### Bill Parser (Screen 2) — `POST /api/parse`
 - Input: base64 encoded image or PDF
-- Claude Vision extracts: line items (name, qty, unit price, food/alcohol category), tax %, service charge %, bill total
-- Output: `{ establishment, items: [{ id, name, qty, unitPrice, category }], tax, serviceCharge, billTotal }`
+- Claude Vision extracts: line items (name, qty, unit price, food/alcohol category), tax %, service charge %, bill total, date
+- Output: `{ establishment, date, items: [{ id, name, qty, unitPrice, category }], tax, serviceCharge, billTotal }`
+- `date` is YYYY-MM-DD from the receipt, or `null` if not found (falls back to current date downstream)
 
 ### Assignment Engine (Screen 5) — `POST /api/assign`
 - Input: `{ items, people, instructions, preferences }`
