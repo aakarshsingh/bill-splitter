@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import html2canvas from 'html2canvas';
 import styles from './Output.module.css';
 
 function formatPrice(paise) {
@@ -54,6 +55,8 @@ export default function Output({ sessionData }) {
   const [copied, setCopied] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const exportRef = useRef(null);
 
   const grandTotal = splitData
     ? Object.values(splitData).reduce((s, d) => s + d.total, 0)
@@ -121,6 +124,24 @@ export default function Output({ sessionData }) {
     }
   };
 
+  const handleExportImage = async () => {
+    setExporting(true);
+    try {
+      const el = exportRef.current;
+      el.style.display = 'block';
+      const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
+      el.style.display = 'none';
+      const link = document.createElement('a');
+      link.download = `${(establishment || 'bill-split').replace(/\s+/g, '-').toLowerCase()}-breakdown.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch {
+      // ignore
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Final Summary</h2>
@@ -170,6 +191,14 @@ export default function Output({ sessionData }) {
         >
           {saving ? 'Saving...' : saveResult ? `Saved: ${saveResult}` : 'Save Session'}
         </button>
+
+        <button
+          className={`${styles.actionBtn} ${styles.exportBtn}`}
+          onClick={handleExportImage}
+          disabled={exporting}
+        >
+          {exporting ? 'Exporting...' : 'Export as Image'}
+        </button>
       </div>
 
       {saveError && (
@@ -198,6 +227,72 @@ export default function Output({ sessionData }) {
           <span className={styles.collapseIcon}>{showDetail ? '\u25B2' : '\u25BC'}</span>
         </button>
         {showDetail && sorted.map(([name, data]) => (
+          <div key={name} className={styles.personBlock}>
+            <div className={styles.personHeader}>
+              <span className={styles.personName}>{name}</span>
+              <span className={styles.personTotal}>{formatPrice(data.total)}</span>
+            </div>
+            <table className={styles.detailTable}>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Share</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.items.map((entry) => (
+                  <tr key={entry.itemId}>
+                    <td className={styles.detailItem}>
+                      {entry.name}
+                      {entry.qty > 1 && <span className={styles.detailQty}> x{entry.qty}</span>}
+                    </td>
+                    <td className={styles.detailShare}>
+                      {entry.parts === entry.totalParts
+                        ? 'all'
+                        : `${entry.parts}/${entry.totalParts}`}
+                    </td>
+                    <td className={styles.detailAmount}>{formatPrice(entry.amount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+
+      {/* Hidden off-screen element for image export */}
+      <div ref={exportRef} className={styles.exportArea} style={{ display: 'none' }}>
+        <div className={styles.exportHeader}>
+          {establishment && <div className={styles.exportEstablishment}>{establishment}</div>}
+          <div className={styles.exportDate}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+        </div>
+        <table className={styles.summaryTable}>
+          <thead>
+            <tr>
+              <th>Person</th>
+              <th>Items</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map(([name, data]) => (
+              <tr key={name}>
+                <td className={styles.personCell}>{name}</td>
+                <td className={styles.itemsCell}>{data.items.length}</td>
+                <td className={styles.amountCell}>{formatPrice(data.total)}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td className={styles.totalLabel}>Total</td>
+              <td></td>
+              <td className={styles.totalAmount}>{formatPrice(grandTotal)}</td>
+            </tr>
+          </tfoot>
+        </table>
+        {sorted.map(([name, data]) => (
           <div key={name} className={styles.personBlock}>
             <div className={styles.personHeader}>
               <span className={styles.personName}>{name}</span>

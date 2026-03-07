@@ -120,6 +120,20 @@
   cursor: default;
 }
 
+.exportBtn {
+  background: #7c4dff;
+  color: #fff;
+}
+
+.exportBtn:hover {
+  background: #651fff;
+}
+
+.exportBtn:disabled {
+  background: #b39ddb;
+  cursor: default;
+}
+
 .error {
   background: #fff5f5;
   border: 1px solid #fcc;
@@ -288,4 +302,33 @@
   font-family: monospace;
   font-weight: 600;
   color: #333;
+}
+
+/* Export area (hidden, rendered for html2canvas) */
+.exportArea {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 600px;
+  padding: 24px;
+  background: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.exportHeader {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #eee;
+}
+
+.exportEstablishment {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.exportDate {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
 }
