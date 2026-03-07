@@ -108,21 +108,23 @@ export default function Instructions({ people, preferences, items, initialInstru
 
   const [instructions, setInstructions] = useState(startingInstructions);
   const [draft, setDraft] = useState('');
-  const [mention, setMention] = useState(null); // { startIndex, query }
-  const [mentionIdx, setMentionIdx] = useState(0); // highlighted index in dropdown
+  const [mention, setMention] = useState(null); // { startIndex, query, type: '@' | '#' }
+  const [mentionIdx, setMentionIdx] = useState(0);
   const textareaRef = useRef(null);
 
   const examples = generateExamples(people, preferences, items);
 
+  const itemNames = (items || []).map((i) => i.name);
+  const personNames = people.map((p) => p.name);
+
   const mentionMatches = mention
-    ? people
-        .map((p) => p.name)
+    ? (mention.type === '@' ? personNames : itemNames)
         .filter((n) => n.toLowerCase().startsWith(mention.query.toLowerCase()))
     : [];
 
   useEffect(() => {
     setMentionIdx(0);
-  }, [mention?.query]);
+  }, [mention?.query, mention?.type]);
 
   const addInstruction = () => {
     const text = draft.trim();
@@ -135,11 +137,11 @@ export default function Instructions({ people, preferences, items, initialInstru
     setInstructions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const insertMention = (name) => {
+  const insertMention = (value) => {
     if (!mention) return;
     const before = draft.slice(0, mention.startIndex);
-    const after = draft.slice(mention.startIndex + mention.query.length + 1); // +1 for @
-    const newDraft = before + name + after;
+    const after = draft.slice(mention.startIndex + mention.query.length + 1); // +1 for trigger char
+    const newDraft = before + value + after;
     setDraft(newDraft);
     setMention(null);
     textareaRef.current?.focus();
@@ -150,14 +152,17 @@ export default function Instructions({ people, preferences, items, initialInstru
     setDraft(val);
 
     const cursor = e.target.selectionStart;
-    // Look backwards from cursor to find an unmatched @
     const textBefore = val.slice(0, cursor);
-    const atIdx = textBefore.lastIndexOf('@');
-    if (atIdx !== -1 && (atIdx === 0 || /\s/.test(textBefore[atIdx - 1]))) {
-      const query = textBefore.slice(atIdx + 1);
-      if (!/\s/.test(query)) {
-        setMention({ startIndex: atIdx, query });
-        return;
+
+    // Check for @ (people) and # (items) triggers, use whichever is closer to cursor
+    for (const trigger of ['@', '#']) {
+      const idx = textBefore.lastIndexOf(trigger);
+      if (idx !== -1 && (idx === 0 || /\s/.test(textBefore[idx - 1]))) {
+        const query = textBefore.slice(idx + 1);
+        if (!/\s/.test(query)) {
+          setMention({ startIndex: idx, query, type: trigger });
+          return;
+        }
       }
     }
     setMention(null);
@@ -250,19 +255,22 @@ export default function Instructions({ people, preferences, items, initialInstru
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onBlur={() => setTimeout(() => setMention(null), 150)}
-            placeholder={examples.length > 0 ? `e.g. "${examples[0]}"` : 'Type an instruction... (use @ to mention people)'}
+            placeholder={examples.length > 0 ? `e.g. "${examples[0]}"` : 'Type an instruction... (@ people, # items)'}
             className={styles.textarea}
             rows={2}
           />
           {mention && mentionMatches.length > 0 && (
             <div className={styles.mentionDropdown}>
-              {mentionMatches.map((name, i) => (
+              <div className={styles.mentionHeader}>
+                {mention.type === '@' ? 'People' : 'Items'}
+              </div>
+              {mentionMatches.map((val, i) => (
                 <button
-                  key={name}
+                  key={val}
                   className={`${styles.mentionItem} ${i === mentionIdx ? styles.mentionActive : ''}`}
-                  onMouseDown={(e) => { e.preventDefault(); insertMention(name); }}
+                  onMouseDown={(e) => { e.preventDefault(); insertMention(val); }}
                 >
-                  {name}
+                  {val}
                 </button>
               ))}
             </div>
