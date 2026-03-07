@@ -51,6 +51,8 @@ export default function Output({ sessionData }) {
   const [saveResult, setSaveResult] = useState(null);
   const [saveError, setSaveError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   const grandTotal = splitData
     ? Object.values(splitData).reduce((s, d) => s + d.total, 0)
@@ -173,15 +175,27 @@ export default function Output({ sessionData }) {
       )}
 
       <div className={styles.previewSection}>
-        <div className={styles.previewHeader}>
+        <button
+          className={styles.previewHeader}
+          onClick={() => setShowPreview((v) => !v)}
+        >
           <span className={styles.previewLabel}>WhatsApp Preview</span>
-        </div>
-        <pre className={styles.previewText}>{whatsappText}</pre>
+          <span className={styles.collapseIcon}>{showPreview ? '\u25B2' : '\u25BC'}</span>
+        </button>
+        {showPreview && (
+          <pre className={styles.previewText}>{whatsappText}</pre>
+        )}
       </div>
 
       <div className={styles.detailSection}>
-        <h3 className={styles.detailTitle}>Detailed Breakdown</h3>
-        {sorted.map(([name, data]) => (
+        <button
+          className={styles.detailToggle}
+          onClick={() => setShowDetail((v) => !v)}
+        >
+          <span className={styles.detailTitle}>Detailed Breakdown</span>
+          <span className={styles.collapseIcon}>{showDetail ? '\u25B2' : '\u25BC'}</span>
+        </button>
+        {showDetail && sorted.map(([name, data]) => (
           <div key={name} className={styles.personBlock}>
             <div className={styles.personHeader}>
               <span className={styles.personName}>{name}</span>
@@ -218,3 +232,4 @@ export default function Output({ sessionData }) {
     </div>
   );
 }
+
