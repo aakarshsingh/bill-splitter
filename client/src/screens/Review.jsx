@@ -1,24 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Review.module.css';
-
-function calcItemBreakdown(item, tax, serviceCharge) {
-  const base = item.unitPrice * item.qty;
-  const sc = serviceCharge / 100;
-  const t = tax / 100;
-  const scAmount = base * sc;
-  if (item.category === 'alcohol') {
-    // Tax only on SC portion, not on alcohol itself
-    const taxAmount = scAmount * t;
-    return { base, scAmount, taxAmount, effective: base + scAmount + taxAmount };
-  }
-  // Food: SC first, then tax on (cost + SC)
-  const taxAmount = (base + scAmount) * t;
-  return { base, scAmount, taxAmount, effective: base + scAmount + taxAmount };
-}
-
-function calcTotal(items, tax, serviceCharge) {
-  return items.reduce((sum, item) => sum + calcItemBreakdown(item, tax, serviceCharge).effective, 0);
-}
+import { FORMULA_MODES, calcItemBreakdown, calcTotal } from '../calcLib';
 
 export default function Review({ file, previewUrl, initialData, onConfirm }) {
   const hasInitial = initialData && initialData.items;
@@ -28,6 +10,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
   const [serviceCharge, setServiceCharge] = useState(hasInitial ? initialData.serviceCharge : 0);
   const [billTotal, setBillTotal] = useState(hasInitial ? initialData.billTotal : 0);
   const [testAssignments, setTestAssignments] = useState(hasInitial ? initialData.testAssignments || null : null);
+  const [formulaMode, setFormulaMode] = useState(hasInitial ? initialData.formulaMode || 'indian-gst' : 'indian-gst');
   const [loading, setLoading] = useState(!hasInitial);
   const [error, setError] = useState(null);
 
@@ -97,7 +80,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
   };
 
   const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
-  const calculated = calcTotal(items, tax, serviceCharge);
+  const calculated = calcTotal(items, tax, serviceCharge, formulaMode);
   const diff = billTotal > 0 ? Math.abs(calculated - billTotal) : 0;
   const isMatched = billTotal > 0 && diff <= 100; // within 1 rupee
 
@@ -147,7 +130,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
             </thead>
             <tbody>
               {items.map((item) => {
-                const bd = calcItemBreakdown(item, tax, serviceCharge);
+                const bd = calcItemBreakdown(item, tax, serviceCharge, formulaMode);
                 return (
                   <tr key={item.id}>
                     <td>
@@ -237,8 +220,24 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
             </div>
           </div>
 
-          <div className={styles.taxNote}>
-            Food: SC added first, then tax on total. Alcohol: tax only on SC, not on item cost.
+          <div className={styles.formulaSection}>
+            <div className={styles.formulaLabel}>Tax/SC Formula</div>
+            <div className={styles.formulaOptions}>
+              {FORMULA_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  className={`${styles.formulaBtn} ${formulaMode === mode.id ? styles.formulaActive : ''}`}
+                  onClick={() => setFormulaMode(mode.id)}
+                  title={mode.formula}
+                >
+                  <span className={styles.formulaBtnLabel}>{mode.label}</span>
+                  <span className={styles.formulaBtnDesc}>{mode.description}</span>
+                </button>
+              ))}
+            </div>
+            <div className={styles.formulaNote}>
+              {FORMULA_MODES.find((m) => m.id === formulaMode)?.formula}
+            </div>
           </div>
 
           <div className={styles.totalsSection}>
@@ -288,7 +287,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
 
           <button
             onClick={() =>
-              onConfirm({ establishment, items, tax, serviceCharge, billTotal, testAssignments })
+              onConfirm({ establishment, items, tax, serviceCharge, billTotal, testAssignments, formulaMode })
             }
             className={styles.confirmBtn}
             disabled={items.length === 0}

@@ -95,6 +95,7 @@ export default function Output({ sessionData }) {
         tax,
         serviceCharge,
         billTotal: reviewData?.billTotal,
+        formulaMode: reviewData?.formulaMode || 'indian-gst',
         people: people?.map((p) => ({ id: p.id, name: p.name })),
         preferences,
         instructions,

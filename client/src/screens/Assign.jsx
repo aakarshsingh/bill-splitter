@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Assign.module.css';
+import { calcEffective } from '../calcLib';
 
 function formatPrice(paise) {
   return (paise / 100).toFixed(2);
-}
-
-function calcEffective(item, tax, serviceCharge) {
-  const base = item.unitPrice * item.qty;
-  const sc = serviceCharge / 100;
-  const t = tax / 100;
-  const scAmount = base * sc;
-  if (item.category === 'alcohol') {
-    return base + scAmount + scAmount * t;
-  }
-  return base + scAmount + (base + scAmount) * t;
 }
 
 // Assignments stored as { itemId: { personName: parts } }
@@ -80,7 +70,7 @@ export default function Assign({
   testAssignments,
   onConfirm,
 }) {
-  const { items, tax, serviceCharge } = reviewData;
+  const { items, tax, serviceCharge, formulaMode } = reviewData;
 
   const [parts, setParts] = useState(() => {
     if (initialAssignments) return initialAssignments;
@@ -189,7 +179,7 @@ export default function Assign({
   const personTotals = {};
   for (const p of people) personTotals[p.name] = 0;
   for (const item of items) {
-    const eff = calcEffective(item, tax, serviceCharge);
+    const eff = calcEffective(item, tax, serviceCharge, formulaMode);
     const itemParts = parts[item.id] || {};
     const totalParts = Object.values(itemParts).reduce((s, v) => s + v, 0);
     if (totalParts === 0) continue;
@@ -251,7 +241,7 @@ export default function Assign({
           </thead>
           <tbody>
             {items.map((item) => {
-              const eff = calcEffective(item, tax, serviceCharge);
+              const eff = calcEffective(item, tax, serviceCharge, formulaMode);
               const itemParts = parts[item.id] || {};
               const totalParts = Object.values(itemParts).reduce((s, v) => s + v, 0);
               const assignedCount = Object.values(itemParts).filter((v) => v > 0).length;

@@ -1,24 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import styles from './Split.module.css';
+import { calcItemBreakdown } from '../calcLib';
 
 function formatPrice(paise) {
   return (paise / 100).toFixed(2);
 }
 
-function calcItemBreakdown(item, tax, serviceCharge) {
-  const base = item.unitPrice * item.qty;
-  const sc = serviceCharge / 100;
-  const t = tax / 100;
-  const scAmount = base * sc;
-  if (item.category === 'alcohol') {
-    const taxAmount = scAmount * t;
-    return { base, scAmount, taxAmount, effective: base + scAmount + taxAmount };
-  }
-  const taxAmount = (base + scAmount) * t;
-  return { base, scAmount, taxAmount, effective: base + scAmount + taxAmount };
-}
-
-function computeSplit(items, assignments, people, tax, serviceCharge) {
+function computeSplit(items, assignments, people, tax, serviceCharge, formulaMode) {
   const itemsById = {};
   for (const item of items) itemsById[item.id] = item;
 
@@ -29,7 +17,7 @@ function computeSplit(items, assignments, people, tax, serviceCharge) {
   }
 
   for (const item of items) {
-    const bd = calcItemBreakdown(item, tax, serviceCharge);
+    const bd = calcItemBreakdown(item, tax, serviceCharge, formulaMode);
     const itemParts = assignments[item.id] || {};
     const totalParts = Object.values(itemParts).reduce((s, v) => s + v, 0);
     if (totalParts === 0) continue;
@@ -58,12 +46,12 @@ function computeSplit(items, assignments, people, tax, serviceCharge) {
 }
 
 export default function Split({ reviewData, people, assignments, onConfirm }) {
-  const { items, tax, serviceCharge, establishment, billTotal } = reviewData;
+  const { items, tax, serviceCharge, establishment, billTotal, formulaMode } = reviewData;
   const [expandedPerson, setExpandedPerson] = useState(null);
 
   const split = useMemo(
-    () => computeSplit(items, assignments, people, tax, serviceCharge),
-    [items, assignments, people, tax, serviceCharge]
+    () => computeSplit(items, assignments, people, tax, serviceCharge, formulaMode),
+    [items, assignments, people, tax, serviceCharge, formulaMode]
   );
 
   const grandTotal = Object.values(split).reduce((s, d) => s + d.total, 0);
