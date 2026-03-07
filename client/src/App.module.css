@@ -1,0 +1,29 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.step {
+  color: #888;
+  font-size: 14px;
+}
+
+.main {
+  min-height: 400px;
+}

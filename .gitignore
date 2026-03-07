@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 
 # personal data
 data/*
+
+# build output
+client/build/
