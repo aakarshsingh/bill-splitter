@@ -27,7 +27,17 @@ export default function App() {
           />
         )}
         {screen === 2 && (
-          <Review />
+          <Review
+            file={sessionData.file}
+            previewUrl={sessionData.previewUrl}
+            onConfirm={(reviewData) => {
+              updateSession(reviewData);
+              setScreen(3);
+            }}
+          />
+        )}
+        {screen === 3 && (
+          <p>Screen 3 — People (not yet implemented)</p>
         )}
       </main>
     </div>

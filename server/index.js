@@ -1,5 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const parseRoute = require('./routes/parse');
 
 const app = express();
 const PORT = 3001;
@@ -7,7 +9,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Routes will be added here as screens are built
+app.use('/api/parse', parseRoute);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

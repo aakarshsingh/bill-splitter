@@ -1,1 +1,83 @@
-// POST /api/parse — bill image -> JSON via Claude Vision — TODO: implement
+const express = require('express');
+const Anthropic = require('@anthropic-ai/sdk');
+const { v4: uuidv4 } = require('uuid');
+
+const router = express.Router();
+const client = new Anthropic();
+
+const SYSTEM_PROMPT = `You are a bill/receipt parser. Extract all line items, tax percentage, and service charge percentage from the bill image.
+
+Return ONLY valid JSON in this exact format, no other text:
+{
+  "establishment": "Name of restaurant/place",
+  "items": [
+    { "name": "Item name", "qty": 1, "unitPrice": 450 }
+  ],
+  "tax": 5,
+  "serviceCharge": 10
+}
+
+Rules:
+- unitPrice must be in the smallest currency unit (paise/cents). If the bill shows 4.50, return 450.
+- qty should be the quantity for that line item. Default to 1 if not clear.
+- unitPrice is the price for ONE unit, not the line total. If line shows "2x Pizza 900", unitPrice should be 450.
+- tax is the tax percentage (e.g. 5 for 5%). Return 0 if no tax found.
+- serviceCharge is the service charge percentage (e.g. 10 for 10%). Return 0 if no service charge found.
+- Do NOT include tax or service charge as line items.
+- establishment should be the name of the restaurant or place if visible, otherwise "Unknown".`;
+
+router.post('/', async (req, res) => {
+  try {
+    const { fileData, mimeType } = req.body;
+
+    if (!fileData || !mimeType) {
+      return res.status(400).json({ error: 'fileData and mimeType are required' });
+    }
+
+    const mediaType = mimeType === 'application/pdf' ? 'application/pdf' : mimeType;
+    const sourceType = mimeType === 'application/pdf' ? 'base64' : 'base64';
+
+    const content = [
+      {
+        type: mimeType === 'application/pdf' ? 'document' : 'image',
+        source: {
+          type: sourceType,
+          media_type: mediaType,
+          data: fileData,
+        },
+      },
+      {
+        type: 'text',
+        text: 'Parse this bill and extract all line items, tax %, and service charge %. Return only JSON.',
+      },
+    ];
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content }],
+    });
+
+    const text = response.content[0].text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: 'Failed to parse AI response as JSON' });
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Add UUIDs to items
+    parsed.items = parsed.items.map((item) => ({
+      id: uuidv4(),
+      ...item,
+    }));
+
+    res.json(parsed);
+  } catch (err) {
+    console.error('Parse error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
