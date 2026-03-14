@@ -134,6 +134,15 @@
   cursor: default;
 }
 
+.startOverBtn {
+  background: #78909c;
+  color: #fff;
+}
+
+.startOverBtn:hover {
+  background: #607d8b;
+}
+
 .error {
   background: #fff5f5;
   border: 1px solid #fcc;

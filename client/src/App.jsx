@@ -158,7 +158,14 @@ export default function App() {
           />
         )}
         {screen === 7 && (
-          <Output sessionData={sessionData} />
+          <Output
+            sessionData={sessionData}
+            onStartOver={() => {
+              setSessionData({});
+              setScreen(1);
+              setMaxStep(1);
+            }}
+          />
         )}
       </main>
     </div>

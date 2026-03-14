@@ -36,7 +36,7 @@ function buildWhatsAppText(establishment, splitData, grandTotal) {
   return lines.join('\n');
 }
 
-export default function Output({ sessionData }) {
+export default function Output({ sessionData, onStartOver }) {
   const {
     reviewData,
     selectedPeople: people,
@@ -200,6 +200,15 @@ export default function Output({ sessionData }) {
         >
           {exporting ? 'Exporting...' : 'Export as Image'}
         </button>
+
+        {saveResult && onStartOver && (
+          <button
+            className={`${styles.actionBtn} ${styles.startOverBtn}`}
+            onClick={onStartOver}
+          >
+            Start Over
+          </button>
+        )}
       </div>
 
       {saveError && (
