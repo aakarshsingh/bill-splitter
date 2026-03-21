@@ -18,6 +18,7 @@ A local bill splitting app. Upload a restaurant bill image/PDF, let AI parse it,
 - WhatsApp-friendly summary copy
 - Export detailed breakdown as PNG image
 - Save/load past sessions (re-saving overwrites the original file)
+- Start Over button after saving to begin a new session
 - Test mode — upload a JSON file to skip AI calls during development
 - 7-step wizard: Upload → Review → People → Instructions → Assign → Split → Output
 
