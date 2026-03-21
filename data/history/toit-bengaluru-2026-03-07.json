@@ -1,0 +1,802 @@
+{
+  "establishment": "Toit - Bengaluru",
+  "date": "2026-03-06",
+  "billDate": "2026-03-06",
+  "items": [
+    {
+      "id": "682f7b47-5ad6-445d-a392-a07b0c566730",
+      "category": "alcohol",
+      "name": "Teacher's Highland Cream 30ML",
+      "qty": 3,
+      "unitPrice": 35000
+    },
+    {
+      "id": "366f9562-6b5d-428a-8738-6ea8b010a30f",
+      "category": "alcohol",
+      "name": "Greater Than Gin 30ML",
+      "qty": 2,
+      "unitPrice": 30000
+    },
+    {
+      "id": "3f79a93a-fada-4b01-b28b-0a02233f3826",
+      "category": "alcohol",
+      "name": "Bacardi Carta Blanca 30ML",
+      "qty": 5,
+      "unitPrice": 32500
+    },
+    {
+      "id": "252654cb-6059-4f57-aabc-f3405221e098",
+      "category": "food",
+      "name": "Diet Coke 300ML",
+      "qty": 2,
+      "unitPrice": 10000
+    },
+    {
+      "id": "77b449b6-785e-475b-986a-0a9ae1b738bf",
+      "category": "food",
+      "name": "Mixer Coke",
+      "qty": 1,
+      "unitPrice": 5000
+    },
+    {
+      "id": "057bdd7a-ce42-4d7a-9c7a-10d00bb55fc6",
+      "category": "alcohol",
+      "name": "Tint-In-Wit (500ML)",
+      "qty": 5,
+      "unitPrice": 30000
+    },
+    {
+      "id": "b6736a2f-8eeb-42e7-825a-fc98dfeda9fa",
+      "category": "alcohol",
+      "name": "Hefeweizen (500ML)",
+      "qty": 4,
+      "unitPrice": 30000
+    },
+    {
+      "id": "02de92a8-a56a-409b-b93a-890f78f19680",
+      "category": "alcohol",
+      "name": "Nitro Stout (500ML)",
+      "qty": 1,
+      "unitPrice": 30000
+    },
+    {
+      "id": "94b13f2d-4067-4068-b0c8-4f9a93a1b109",
+      "category": "alcohol",
+      "name": "Tint-In-Wit Small (250ML)",
+      "qty": 1,
+      "unitPrice": 17500
+    },
+    {
+      "id": "db35d3e0-a034-49eb-b587-46b3826335e3",
+      "category": "food",
+      "name": "BBQ Chicken Pizza - H",
+      "qty": 1,
+      "unitPrice": 31250
+    },
+    {
+      "id": "b4330c49-b562-4339-9586-19add15f9532",
+      "category": "food",
+      "name": "Pepperoni Pizza - H",
+      "qty": 1,
+      "unitPrice": 36250
+    },
+    {
+      "id": "e10b17b0-0bc4-4498-af93-c23532e4d0af",
+      "category": "food",
+      "name": "West Coast Pepper Mutton",
+      "qty": 1,
+      "unitPrice": 47500
+    },
+    {
+      "id": "cb752cbb-2e48-409f-9b39-523c6cbc45c5",
+      "category": "food",
+      "name": "Donne Biryani - Chicken",
+      "qty": 1,
+      "unitPrice": 42500
+    },
+    {
+      "id": "953c4064-e13f-4975-8d18-c2ea303539e4",
+      "category": "food",
+      "name": "Chicken Piccata",
+      "qty": 1,
+      "unitPrice": 35000
+    },
+    {
+      "id": "77b1c606-a42a-4387-a3e9-8eb3d7a4a76f",
+      "category": "food",
+      "name": "Puliyogare Poppers",
+      "qty": 1,
+      "unitPrice": 27500
+    },
+    {
+      "id": "2d15382b-99b3-41fc-a615-367dc5fe1a36",
+      "category": "food",
+      "name": "Kerala Beef Fry",
+      "qty": 1,
+      "unitPrice": 37500
+    }
+  ],
+  "tax": 5,
+  "serviceCharge": 7.5,
+  "billTotal": 1014700,
+  "formulaMode": "indian-gst",
+  "people": [
+    {
+      "id": "4958bf67-818e-4f2f-a3aa-8b70d4046710",
+      "name": "Aakarsh Singh"
+    },
+    {
+      "id": "c12a37bc-643a-4da2-bd27-85958212d527",
+      "name": "Jai Karkhanis"
+    },
+    {
+      "id": "9198720d-db12-45a9-9533-fa6330023ea6",
+      "name": "Madhav Kauntia"
+    },
+    {
+      "id": "0db300ea-2e63-4e75-8571-8b8fd25d7971",
+      "name": "Sai Kiranmayi Varanasi"
+    },
+    {
+      "id": "fb8e3d03-4456-46f4-a2a5-203ac5793d52",
+      "name": "Srivatsa Kumar"
+    },
+    {
+      "id": "da20e1af-c821-4c38-8b42-cb7aa8e6e937",
+      "name": "Tanya Singh"
+    },
+    {
+      "id": "6b670f51-1e02-42d2-bde1-c3df802fbb6d",
+      "name": "Yamini H Kadakol"
+    }
+  ],
+  "preferences": {
+    "Aakarsh Singh": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer",
+        "wine",
+        "vodka",
+        "cocktails"
+      ]
+    },
+    "Harsh Agarwal": {
+      "diet": "non-veg",
+      "meats": [
+        "seafood",
+        "chicken",
+        "mutton"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Jai Karkhanis": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Madhav Kauntia": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Nikita Thacker": {
+      "diet": "veg",
+      "meats": [],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Poorvi Seth": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Pratistha Prasad": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "seafood"
+      ],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Sai Kiranmayi Varanasi": {
+      "diet": "veg",
+      "meats": [],
+      "drinks": [
+        "gin"
+      ]
+    },
+    "Shreya Thacker": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "seafood"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Srivatsa Kumar": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer",
+        "wine",
+        "whisky"
+      ]
+    },
+    "Tanya Singh": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "pork",
+        "beef",
+        "seafood",
+        "mutton"
+      ],
+      "drinks": [
+        "cocktails",
+        "rum"
+      ]
+    },
+    "Yamini H Kadakol": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton"
+      ],
+      "drinks": [
+        "whisky"
+      ]
+    }
+  },
+  "instructions": [
+    "Tanya Singh had all the Bacardi Carta Blanca 30ML with Diet Coke 300ML",
+    "Aakarsh Singh had 3 Tint-In-Wit (500ML), Madhav Kauntia had the other 2",
+    "Jai Karkhanis had 1 Nitro Stout (500ML), 1 Hefeweizen (500ML) and 1 Tint-In-Wit Small (250ML)",
+    "Srivatsa Kumar had 3 Hefeweizen (500ML)",
+    "Yamini H Kadakol had all the Teacher's Highland Cream 30ML with Mixer Coke",
+    "Sai Kiranmayi Varanasi had all the Greater Than Gin 30ML",
+    "Split the Pepperoni Pizza - H between Tanya Singh, Srivatsa Kumar and 2 shares to Jai Karkhanis",
+    "Split the BBQ Chicken Pizza - H between Tanya Singh, Aakarsh Singh, Jai Karkhanis and Srivatsa Kumar",
+    "All of the Chicken Piccata on Aakarsh Singh",
+    "Split Donne Biryani - Chicken between Yamini H Kadakol, Srivatsa Kumar and Madhav Kauntia",
+    "All of the Puliyogare Poppers on Sai Kiranmayi Varanasi",
+    "Split the Kerala Beef Fry between Tanya Singh, Srivatsa Kumar and 2 parts on Jai Karkhanis",
+    "Split the West Coast Pepper Mutton between Aakarsh Singh, Jai Karkhanis and Srivatsa Kumar"
+  ],
+  "assignments": {
+    "682f7b47-5ad6-445d-a392-a07b0c566730": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 1
+    },
+    "366f9562-6b5d-428a-8738-6ea8b010a30f": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 1,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "3f79a93a-fada-4b01-b28b-0a02233f3826": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 1,
+      "Yamini H Kadakol": 0
+    },
+    "252654cb-6059-4f57-aabc-f3405221e098": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 1,
+      "Yamini H Kadakol": 0
+    },
+    "77b449b6-785e-475b-986a-0a9ae1b738bf": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 1
+    },
+    "057bdd7a-ce42-4d7a-9c7a-10d00bb55fc6": {
+      "Aakarsh Singh": 3,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 2,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "b6736a2f-8eeb-42e7-825a-fc98dfeda9fa": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 1,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 3,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "02de92a8-a56a-409b-b93a-890f78f19680": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 1,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "94b13f2d-4067-4068-b0c8-4f9a93a1b109": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 1,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "db35d3e0-a034-49eb-b587-46b3826335e3": {
+      "Aakarsh Singh": 1,
+      "Jai Karkhanis": 1,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 1,
+      "Yamini H Kadakol": 0
+    },
+    "b4330c49-b562-4339-9586-19add15f9532": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 2,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 1,
+      "Yamini H Kadakol": 0
+    },
+    "e10b17b0-0bc4-4498-af93-c23532e4d0af": {
+      "Aakarsh Singh": 1,
+      "Jai Karkhanis": 1,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "cb752cbb-2e48-409f-9b39-523c6cbc45c5": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 1,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 1
+    },
+    "953c4064-e13f-4975-8d18-c2ea303539e4": {
+      "Aakarsh Singh": 1,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "77b1c606-a42a-4387-a3e9-8eb3d7a4a76f": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 0,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 1,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "2d15382b-99b3-41fc-a615-367dc5fe1a36": {
+      "Aakarsh Singh": 0,
+      "Jai Karkhanis": 2,
+      "Madhav Kauntia": 0,
+      "Sai Kiranmayi Varanasi": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 1,
+      "Yamini H Kadakol": 0
+    }
+  },
+  "splitData": {
+    "Aakarsh Singh": {
+      "items": [
+        {
+          "itemId": "057bdd7a-ce42-4d7a-9c7a-10d00bb55fc6",
+          "name": "Tint-In-Wit (500ML)",
+          "category": "alcohol",
+          "qty": 5,
+          "effective": 161812.5,
+          "parts": 3,
+          "totalParts": 5,
+          "fraction": 0.6,
+          "amount": 97087.5
+        },
+        {
+          "itemId": "db35d3e0-a034-49eb-b587-46b3826335e3",
+          "name": "BBQ Chicken Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 35273.4375,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 8818.359375
+        },
+        {
+          "itemId": "e10b17b0-0bc4-4498-af93-c23532e4d0af",
+          "name": "West Coast Pepper Mutton",
+          "category": "food",
+          "qty": 1,
+          "effective": 53615.625,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 17871.875
+        },
+        {
+          "itemId": "953c4064-e13f-4975-8d18-c2ea303539e4",
+          "name": "Chicken Piccata",
+          "category": "food",
+          "qty": 1,
+          "effective": 39506.25,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 39506.25
+        }
+      ],
+      "total": 163283.984375
+    },
+    "Jai Karkhanis": {
+      "items": [
+        {
+          "itemId": "b6736a2f-8eeb-42e7-825a-fc98dfeda9fa",
+          "name": "Hefeweizen (500ML)",
+          "category": "alcohol",
+          "qty": 4,
+          "effective": 129450,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 32362.5
+        },
+        {
+          "itemId": "02de92a8-a56a-409b-b93a-890f78f19680",
+          "name": "Nitro Stout (500ML)",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 32362.5,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 32362.5
+        },
+        {
+          "itemId": "94b13f2d-4067-4068-b0c8-4f9a93a1b109",
+          "name": "Tint-In-Wit Small (250ML)",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 18878.125,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 18878.125
+        },
+        {
+          "itemId": "db35d3e0-a034-49eb-b587-46b3826335e3",
+          "name": "BBQ Chicken Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 35273.4375,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 8818.359375
+        },
+        {
+          "itemId": "b4330c49-b562-4339-9586-19add15f9532",
+          "name": "Pepperoni Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 40917.1875,
+          "parts": 2,
+          "totalParts": 4,
+          "fraction": 0.5,
+          "amount": 20458.59375
+        },
+        {
+          "itemId": "e10b17b0-0bc4-4498-af93-c23532e4d0af",
+          "name": "West Coast Pepper Mutton",
+          "category": "food",
+          "qty": 1,
+          "effective": 53615.625,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 17871.875
+        },
+        {
+          "itemId": "2d15382b-99b3-41fc-a615-367dc5fe1a36",
+          "name": "Kerala Beef Fry",
+          "category": "food",
+          "qty": 1,
+          "effective": 42328.125,
+          "parts": 2,
+          "totalParts": 4,
+          "fraction": 0.5,
+          "amount": 21164.0625
+        }
+      ],
+      "total": 151916.015625
+    },
+    "Madhav Kauntia": {
+      "items": [
+        {
+          "itemId": "057bdd7a-ce42-4d7a-9c7a-10d00bb55fc6",
+          "name": "Tint-In-Wit (500ML)",
+          "category": "alcohol",
+          "qty": 5,
+          "effective": 161812.5,
+          "parts": 2,
+          "totalParts": 5,
+          "fraction": 0.4,
+          "amount": 64725
+        },
+        {
+          "itemId": "cb752cbb-2e48-409f-9b39-523c6cbc45c5",
+          "name": "Donne Biryani - Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 47971.875,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 15990.625
+        }
+      ],
+      "total": 80715.625
+    },
+    "Sai Kiranmayi Varanasi": {
+      "items": [
+        {
+          "itemId": "366f9562-6b5d-428a-8738-6ea8b010a30f",
+          "name": "Greater Than Gin 30ML",
+          "category": "alcohol",
+          "qty": 2,
+          "effective": 64725,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 64725
+        },
+        {
+          "itemId": "77b1c606-a42a-4387-a3e9-8eb3d7a4a76f",
+          "name": "Puliyogare Poppers",
+          "category": "food",
+          "qty": 1,
+          "effective": 31040.625,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 31040.625
+        }
+      ],
+      "total": 95765.625
+    },
+    "Srivatsa Kumar": {
+      "items": [
+        {
+          "itemId": "b6736a2f-8eeb-42e7-825a-fc98dfeda9fa",
+          "name": "Hefeweizen (500ML)",
+          "category": "alcohol",
+          "qty": 4,
+          "effective": 129450,
+          "parts": 3,
+          "totalParts": 4,
+          "fraction": 0.75,
+          "amount": 97087.5
+        },
+        {
+          "itemId": "db35d3e0-a034-49eb-b587-46b3826335e3",
+          "name": "BBQ Chicken Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 35273.4375,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 8818.359375
+        },
+        {
+          "itemId": "b4330c49-b562-4339-9586-19add15f9532",
+          "name": "Pepperoni Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 40917.1875,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 10229.296875
+        },
+        {
+          "itemId": "e10b17b0-0bc4-4498-af93-c23532e4d0af",
+          "name": "West Coast Pepper Mutton",
+          "category": "food",
+          "qty": 1,
+          "effective": 53615.625,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 17871.875
+        },
+        {
+          "itemId": "cb752cbb-2e48-409f-9b39-523c6cbc45c5",
+          "name": "Donne Biryani - Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 47971.875,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 15990.625
+        },
+        {
+          "itemId": "2d15382b-99b3-41fc-a615-367dc5fe1a36",
+          "name": "Kerala Beef Fry",
+          "category": "food",
+          "qty": 1,
+          "effective": 42328.125,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 10582.03125
+        }
+      ],
+      "total": 160579.6875
+    },
+    "Tanya Singh": {
+      "items": [
+        {
+          "itemId": "3f79a93a-fada-4b01-b28b-0a02233f3826",
+          "name": "Bacardi Carta Blanca 30ML",
+          "category": "alcohol",
+          "qty": 5,
+          "effective": 175296.875,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 175296.875
+        },
+        {
+          "itemId": "252654cb-6059-4f57-aabc-f3405221e098",
+          "name": "Diet Coke 300ML",
+          "category": "food",
+          "qty": 2,
+          "effective": 22575,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 22575
+        },
+        {
+          "itemId": "db35d3e0-a034-49eb-b587-46b3826335e3",
+          "name": "BBQ Chicken Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 35273.4375,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 8818.359375
+        },
+        {
+          "itemId": "b4330c49-b562-4339-9586-19add15f9532",
+          "name": "Pepperoni Pizza - H",
+          "category": "food",
+          "qty": 1,
+          "effective": 40917.1875,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 10229.296875
+        },
+        {
+          "itemId": "2d15382b-99b3-41fc-a615-367dc5fe1a36",
+          "name": "Kerala Beef Fry",
+          "category": "food",
+          "qty": 1,
+          "effective": 42328.125,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 10582.03125
+        }
+      ],
+      "total": 227501.5625
+    },
+    "Yamini H Kadakol": {
+      "items": [
+        {
+          "itemId": "682f7b47-5ad6-445d-a392-a07b0c566730",
+          "name": "Teacher's Highland Cream 30ML",
+          "category": "alcohol",
+          "qty": 3,
+          "effective": 113268.75,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 113268.75
+        },
+        {
+          "itemId": "77b449b6-785e-475b-986a-0a9ae1b738bf",
+          "name": "Mixer Coke",
+          "category": "food",
+          "qty": 1,
+          "effective": 5643.75,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 5643.75
+        },
+        {
+          "itemId": "cb752cbb-2e48-409f-9b39-523c6cbc45c5",
+          "name": "Donne Biryani - Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 47971.875,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 15990.625
+        }
+      ],
+      "total": 134903.125
+    }
+  }
+}

@@ -1,0 +1,417 @@
+{
+  "establishment": "MIRTH",
+  "date": "2026-03-14",
+  "billDate": "2026-03-14",
+  "items": [
+    {
+      "id": "aec04003-79b7-43fc-a52b-0a9d7949872f",
+      "category": "alcohol",
+      "name": "PICANTE ZAAI",
+      "qty": 2,
+      "unitPrice": 119500
+    },
+    {
+      "id": "cd49ec65-4dae-4849-bc11-6ea8d1fadc56",
+      "category": "alcohol",
+      "name": "POUR ME A SLICE",
+      "qty": 1,
+      "unitPrice": 119500
+    },
+    {
+      "id": "58a784e4-5a28-485d-b6bb-c0f80204973b",
+      "category": "alcohol",
+      "name": "CLEAR INTENTIONS",
+      "qty": 5,
+      "unitPrice": 99000
+    },
+    {
+      "id": "8ef583b9-8803-422d-b33c-5ffa30387b64",
+      "category": "alcohol",
+      "name": "COCO MELLOW",
+      "qty": 1,
+      "unitPrice": 45000
+    },
+    {
+      "id": "2a00808e-1402-4b6e-87e9-2c450473da6b",
+      "category": "alcohol",
+      "name": "BOMBAY SAPPHIRE LONDON DRY GIN",
+      "qty": 1,
+      "unitPrice": 43000
+    },
+    {
+      "id": "e9ecfd64-13d0-45a8-bf05-0c1c342b894c",
+      "category": "food",
+      "name": "Schweppes Tonic Water 300ml Can",
+      "qty": 1,
+      "unitPrice": 22000
+    },
+    {
+      "id": "66f54fa1-7ca3-4bee-8eec-edab46ecaf0b",
+      "category": "alcohol",
+      "name": "MARTINI REVOLVER",
+      "qty": 1,
+      "unitPrice": 109500
+    }
+  ],
+  "tax": 15.5,
+  "serviceCharge": 0,
+  "billTotal": 1076400,
+  "formulaMode": "indian-gst",
+  "people": [
+    {
+      "id": "4958bf67-818e-4f2f-a3aa-8b70d4046710",
+      "name": "Aakarsh Singh"
+    },
+    {
+      "id": "e74cee9e-0bc9-416f-894e-17920ad90869",
+      "name": "Nikita Thacker"
+    },
+    {
+      "id": "71ddaf3b-dc5d-4d46-acd0-848f07d63832",
+      "name": "Shreya Thacker"
+    },
+    {
+      "id": "fb8e3d03-4456-46f4-a2a5-203ac5793d52",
+      "name": "Srivatsa Kumar"
+    },
+    {
+      "id": "da20e1af-c821-4c38-8b42-cb7aa8e6e937",
+      "name": "Tanya Singh"
+    },
+    {
+      "id": "6b670f51-1e02-42d2-bde1-c3df802fbb6d",
+      "name": "Yamini H Kadakol"
+    }
+  ],
+  "preferences": {
+    "Aakarsh Singh": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer",
+        "wine",
+        "vodka",
+        "cocktails"
+      ]
+    },
+    "Harsh Agarwal": {
+      "diet": "non-veg",
+      "meats": [
+        "seafood",
+        "chicken",
+        "mutton"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Jai Karkhanis": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Madhav Kauntia": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Nikita Thacker": {
+      "diet": "veg",
+      "meats": [],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Poorvi Seth": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Pratistha Prasad": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "seafood"
+      ],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Sai Kiranmayi Varanasi": {
+      "diet": "veg",
+      "meats": [],
+      "drinks": [
+        "gin"
+      ]
+    },
+    "Shreya Thacker": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "seafood"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Srivatsa Kumar": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer",
+        "wine",
+        "whisky"
+      ]
+    },
+    "Tanya Singh": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "pork",
+        "beef",
+        "seafood",
+        "mutton"
+      ],
+      "drinks": [
+        "cocktails",
+        "rum"
+      ]
+    },
+    "Yamini H Kadakol": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton"
+      ],
+      "drinks": [
+        "whisky"
+      ]
+    }
+  },
+  "instructions": [
+    "Shreya Thacker had BOMBAY SAPPHIRE LONDON DRY GIN",
+    "Shreya Thacker had Schweppes Tonic Water 300ml Can",
+    "Nikita Thacker had 2 CLEAR INTENTIONS",
+    "Tanya Singh had 2 CLEAR INTENTIONS",
+    "Shreya Thacker had 1 CLEAR INTENTIONS",
+    "Aakarsh Singh had 2 PICANTE ZAAI",
+    "Srivatsa Kumar had 1 POUR ME A SLICE and MARTINI REVOLVER",
+    "Yamini H Kadakol had 1 COCO MELLOW"
+  ],
+  "assignments": {
+    "aec04003-79b7-43fc-a52b-0a9d7949872f": {
+      "Aakarsh Singh": 1,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "cd49ec65-4dae-4849-bc11-6ea8d1fadc56": {
+      "Aakarsh Singh": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "58a784e4-5a28-485d-b6bb-c0f80204973b": {
+      "Aakarsh Singh": 0,
+      "Nikita Thacker": 2,
+      "Shreya Thacker": 1,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 2,
+      "Yamini H Kadakol": 0
+    },
+    "8ef583b9-8803-422d-b33c-5ffa30387b64": {
+      "Aakarsh Singh": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 1
+    },
+    "2a00808e-1402-4b6e-87e9-2c450473da6b": {
+      "Aakarsh Singh": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 1,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "e9ecfd64-13d0-45a8-bf05-0c1c342b894c": {
+      "Aakarsh Singh": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 1,
+      "Srivatsa Kumar": 0,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    },
+    "66f54fa1-7ca3-4bee-8eec-edab46ecaf0b": {
+      "Aakarsh Singh": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0,
+      "Srivatsa Kumar": 1,
+      "Tanya Singh": 0,
+      "Yamini H Kadakol": 0
+    }
+  },
+  "splitData": {
+    "Aakarsh Singh": {
+      "items": [
+        {
+          "itemId": "aec04003-79b7-43fc-a52b-0a9d7949872f",
+          "name": "PICANTE ZAAI",
+          "category": "alcohol",
+          "qty": 2,
+          "effective": 239000,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 239000
+        }
+      ],
+      "total": 239000
+    },
+    "Nikita Thacker": {
+      "items": [
+        {
+          "itemId": "58a784e4-5a28-485d-b6bb-c0f80204973b",
+          "name": "CLEAR INTENTIONS",
+          "category": "alcohol",
+          "qty": 5,
+          "effective": 495000,
+          "parts": 2,
+          "totalParts": 5,
+          "fraction": 0.4,
+          "amount": 198000
+        }
+      ],
+      "total": 198000
+    },
+    "Shreya Thacker": {
+      "items": [
+        {
+          "itemId": "58a784e4-5a28-485d-b6bb-c0f80204973b",
+          "name": "CLEAR INTENTIONS",
+          "category": "alcohol",
+          "qty": 5,
+          "effective": 495000,
+          "parts": 1,
+          "totalParts": 5,
+          "fraction": 0.2,
+          "amount": 99000
+        },
+        {
+          "itemId": "2a00808e-1402-4b6e-87e9-2c450473da6b",
+          "name": "BOMBAY SAPPHIRE LONDON DRY GIN",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 43000,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 43000
+        },
+        {
+          "itemId": "e9ecfd64-13d0-45a8-bf05-0c1c342b894c",
+          "name": "Schweppes Tonic Water 300ml Can",
+          "category": "food",
+          "qty": 1,
+          "effective": 25410,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 25410
+        }
+      ],
+      "total": 167410
+    },
+    "Srivatsa Kumar": {
+      "items": [
+        {
+          "itemId": "cd49ec65-4dae-4849-bc11-6ea8d1fadc56",
+          "name": "POUR ME A SLICE",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 119500,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 119500
+        },
+        {
+          "itemId": "66f54fa1-7ca3-4bee-8eec-edab46ecaf0b",
+          "name": "MARTINI REVOLVER",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 109500,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 109500
+        }
+      ],
+      "total": 229000
+    },
+    "Tanya Singh": {
+      "items": [
+        {
+          "itemId": "58a784e4-5a28-485d-b6bb-c0f80204973b",
+          "name": "CLEAR INTENTIONS",
+          "category": "alcohol",
+          "qty": 5,
+          "effective": 495000,
+          "parts": 2,
+          "totalParts": 5,
+          "fraction": 0.4,
+          "amount": 198000
+        }
+      ],
+      "total": 198000
+    },
+    "Yamini H Kadakol": {
+      "items": [
+        {
+          "itemId": "8ef583b9-8803-422d-b33c-5ffa30387b64",
+          "name": "COCO MELLOW",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 45000,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 45000
+        }
+      ],
+      "total": 45000
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "Aakarsh Singh": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "mutton",
+      "pork",
+      "beef"
+    ],
+    "drinks": [
+      "beer",
+      "wine",
+      "vodka",
+      "cocktails"
+    ]
+  },
+  "Harsh Agarwal": {
+    "diet": "non-veg",
+    "meats": [
+      "seafood",
+      "chicken",
+      "mutton"
+    ],
+    "drinks": [
+      "beer"
+    ]
+  },
+  "Jai Karkhanis": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "mutton",
+      "pork",
+      "beef"
+    ],
+    "drinks": [
+      "beer"
+    ]
+  },
+  "Madhav Kauntia": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken"
+    ],
+    "drinks": [
+      "beer"
+    ]
+  },
+  "Nikita Thacker": {
+    "diet": "veg",
+    "meats": [],
+    "drinks": [
+      "beer",
+      "gin"
+    ]
+  },
+  "Poorvi Seth": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken"
+    ],
+    "drinks": [
+      "beer"
+    ]
+  },
+  "Pratistha Prasad": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "seafood"
+    ],
+    "drinks": [
+      "beer",
+      "gin"
+    ]
+  },
+  "Sai Kiranmayi Varanasi": {
+    "diet": "veg",
+    "meats": [],
+    "drinks": [
+      "gin"
+    ]
+  },
+  "Shreya Thacker": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "seafood"
+    ],
+    "drinks": [
+      "beer",
+      "gin"
+    ]
+  },
+  "Srivatsa Kumar": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "mutton",
+      "pork",
+      "beef"
+    ],
+    "drinks": [
+      "beer",
+      "wine",
+      "whisky"
+    ]
+  },
+  "Tanya Singh": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "pork",
+      "beef",
+      "seafood",
+      "mutton"
+    ],
+    "drinks": [
+      "cocktails",
+      "rum"
+    ]
+  },
+  "Yamini H Kadakol": {
+    "diet": "non-veg",
+    "meats": [
+      "chicken",
+      "mutton"
+    ],
+    "drinks": [
+      "whisky"
+    ]
+  }
+}

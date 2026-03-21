@@ -3,8 +3,9 @@ const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
-const HISTORY_DIR = path.join(__dirname, '../../data/history');
-const PREFS_FILE = path.join(__dirname, '../../data/preferences.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../../data');
+const HISTORY_DIR = path.join(DATA_DIR, 'history');
+const PREFS_FILE = path.join(DATA_DIR, 'preferences.json');
 
 // Only learn these known keywords — keeps preferences clean and useful
 const MEAT_KEYWORDS = ['chicken', 'mutton', 'lamb', 'pork', 'beef', 'seafood', 'fish', 'prawn', 'shrimp', 'crab', 'lobster', 'squid'];

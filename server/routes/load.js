@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
-const HISTORY_DIR = path.join(__dirname, '../../data/history');
+const HISTORY_DIR = path.join(process.env.DATA_DIR || path.join(__dirname, '../../data'), 'history');
 
 // GET /api/load — list saved sessions
 router.get('/', (req, res) => {
