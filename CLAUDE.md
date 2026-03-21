@@ -72,6 +72,7 @@ Upload -> Review -> People -> Instructions -> Assign -> Split -> Output
 6. **Split** — Pure frontend calculation, no API. Per-person cards sorted by total (highest first), each expandable to show itemised breakdown table (item name, type, effective price, share fraction, amount). Proportional share bar per person. Overview bar shows item count, people, tax/SC rates, and grand total. Bill total reconciliation warning if mismatch. On confirm, passes computed split data to Screen 7.
 7. **Output** — Summary table (person, items, amount) sorted by total. One-click **Copy for WhatsApp** button generates formatted text with bold names, item breakdowns, and totals (Rs amounts rounded to whole numbers). WhatsApp preview shown below. **Save Session** writes full session to `data/history/establishment-YYYY-MM-DD.json` via `/api/save`; sessions loaded from history overwrite the original file instead of creating a new one. **Export as Image** captures the full summary + detailed breakdown as a 2x PNG via `html2canvas`. Detailed per-person breakdown with item-level share fractions (collapsible). **Start Over** button (appears after saving) resets all session data and returns to the Upload screen.
 
+
 ## API Routes
 
 | Method | Route | Purpose |
