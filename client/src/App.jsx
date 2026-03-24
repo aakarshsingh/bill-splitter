@@ -91,8 +91,8 @@ export default function App() {
           <Upload
             initialFile={sessionData.file}
             initialPreviewUrl={sessionData.previewUrl}
-            onConfirm={(file, previewUrl) => {
-              updateSession({ file, previewUrl });
+            onConfirm={(file, previewUrl, pdfPage) => {
+              updateSession({ file, previewUrl, pdfPage });
               advance(2);
             }}
             onLoadSession={loadSession}
@@ -102,6 +102,7 @@ export default function App() {
           <Review
             file={sessionData.file}
             previewUrl={sessionData.previewUrl}
+            pdfPage={sessionData.pdfPage}
             initialData={sessionData.reviewData}
             onConfirm={(reviewData) => {
               updateSession({ reviewData });

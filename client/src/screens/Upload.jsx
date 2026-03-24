@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { PDFDocument } from 'pdf-lib';
 import styles from './Upload.module.css';
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/json'];
@@ -8,6 +9,8 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
   const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || null);
   const [error, setError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
+  const [pdfPageCount, setPdfPageCount] = useState(0);
+  const [selectedPage, setSelectedPage] = useState(1);
   const inputRef = useRef();
 
   const [history, setHistory] = useState([]);
@@ -21,14 +24,26 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
       .catch(() => {});
   }, []);
 
-  const handleFile = useCallback((f) => {
+  const handleFile = useCallback(async (f) => {
     if (!ACCEPTED_TYPES.includes(f.type)) {
       setError('Please upload a JPG, PNG, PDF, or JSON file.');
       return;
     }
     setError(null);
     setFile(f);
-    if (f.type !== 'application/json') {
+    setPdfPageCount(0);
+    setSelectedPage(1);
+    if (f.type === 'application/pdf') {
+      setPreviewUrl(URL.createObjectURL(f));
+      try {
+        const buf = await f.arrayBuffer();
+        const pdf = await PDFDocument.load(buf, { ignoreEncryption: true });
+        const count = pdf.getPageCount();
+        setPdfPageCount(count);
+      } catch {
+        setPdfPageCount(1);
+      }
+    } else if (f.type !== 'application/json') {
       setPreviewUrl(URL.createObjectURL(f));
     } else {
       setPreviewUrl(null);
@@ -60,6 +75,8 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
     setFile(null);
     setPreviewUrl(null);
     setError(null);
+    setPdfPageCount(0);
+    setSelectedPage(1);
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -142,8 +159,44 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
               />
             )}
           </div>
+          {isPdf && pdfPageCount > 1 && (
+            <div className={styles.pageSelector}>
+              <label htmlFor="pdfPageSelect" className={styles.pageSelectorLabel}>
+                This PDF has {pdfPageCount} pages. Which page is the bill on?
+              </label>
+              <div className={styles.pageSelectorControls}>
+                <button
+                  className={styles.pageArrowBtn}
+                  onClick={() => setSelectedPage((p) => Math.max(1, p - 1))}
+                  disabled={selectedPage <= 1}
+                >
+                  ‹
+                </button>
+                <input
+                  id="pdfPageSelect"
+                  type="number"
+                  min={1}
+                  max={pdfPageCount}
+                  value={selectedPage}
+                  onChange={(e) => {
+                    const v = Math.max(1, Math.min(pdfPageCount, parseInt(e.target.value, 10) || 1));
+                    setSelectedPage(v);
+                  }}
+                  className={styles.pageInput}
+                />
+                <span className={styles.pageTotal}>of {pdfPageCount}</span>
+                <button
+                  className={styles.pageArrowBtn}
+                  onClick={() => setSelectedPage((p) => Math.min(pdfPageCount, p + 1))}
+                  disabled={selectedPage >= pdfPageCount}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+          )}
           <button
-            onClick={() => onConfirm(file, previewUrl)}
+            onClick={() => onConfirm(file, previewUrl, isPdf && pdfPageCount > 1 ? selectedPage : null)}
             className={styles.confirmBtn}
           >
             {isJson ? 'Load Test Data' : 'Confirm & Continue'}
