@@ -48,7 +48,15 @@ function computeSplit(items, assignments, people, tax, serviceCharge, formulaMod
 export default function Split({ reviewData, people, assignments, initialDiscount, onConfirm }) {
   const { items, tax, serviceCharge, establishment, billTotal, formulaMode } = reviewData;
   const [expandedPerson, setExpandedPerson] = useState(null);
-  const [discountRupees, setDiscountRupees] = useState(initialDiscount || '');
+  const [discountRupees, setDiscountRupees] = useState(
+    initialDiscount?.discount || ''
+  );
+  const [finalAmountRupees, setFinalAmountRupees] = useState(
+    initialDiscount?.finalAmount || ''
+  );
+  const [activeField, setActiveField] = useState(
+    initialDiscount?.field || null
+  );
 
   const split = useMemo(
     () => computeSplit(items, assignments, people, tax, serviceCharge, formulaMode),
@@ -60,12 +68,21 @@ export default function Split({ reviewData, people, assignments, initialDiscount
     [split]
   );
 
+  const preTotalRupees = preTotalPaise / 100;
+
   const discountPaise = useMemo(() => {
+    if (activeField === 'final') {
+      const v = Number(finalAmountRupees);
+      if (!v || v <= 0) return preTotalPaise;
+      const paid = Math.round(v * 100);
+      const disc = preTotalPaise - paid;
+      return disc > 0 ? disc : 0;
+    }
     const v = Number(discountRupees);
     if (!v || v <= 0) return 0;
     const raw = Math.round(v * 100);
     return raw <= preTotalPaise ? raw : preTotalPaise;
-  }, [discountRupees, preTotalPaise]);
+  }, [activeField, discountRupees, finalAmountRupees, preTotalPaise]);
 
   const splitWithDiscount = useMemo(() => {
     const names = Object.keys(split);
@@ -170,17 +187,68 @@ export default function Split({ reviewData, people, assignments, initialDiscount
       )}
 
       <div className={styles.discountSection}>
-        <label htmlFor="discountInput" className={styles.discountLabel}>Flat Discount (₹)</label>
-        <input
-          id="discountInput"
-          type="number"
-          min="0"
-          step="0.01"
-          value={discountRupees}
-          onChange={(e) => setDiscountRupees(e.target.value)}
-          placeholder="0"
-          className={styles.discountInput}
-        />
+        <div className={styles.discountField}>
+          <label htmlFor="discountInput" className={styles.discountLabel}>Flat Discount (₹)</label>
+          <input
+            id="discountInput"
+            type="number"
+            min="0"
+            step="0.01"
+            value={activeField === 'final' ? (discountPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
+            onChange={(e) => {
+              setActiveField('discount');
+              setDiscountRupees(e.target.value);
+              setFinalAmountRupees('');
+            }}
+            onFocus={() => {
+              if (activeField !== 'discount') {
+                setActiveField('discount');
+                setFinalAmountRupees('');
+              }
+            }}
+            placeholder="0"
+            className={`${styles.discountInput} ${activeField === 'discount' ? styles.discountInputActive : ''}`}
+            readOnly={activeField === 'final'}
+          />
+        </div>
+        <span className={styles.discountOr}>or</span>
+        <div className={styles.discountField}>
+          <label htmlFor="finalAmountInput" className={styles.discountLabel}>Final Amount Paid (₹)</label>
+          <input
+            id="finalAmountInput"
+            type="number"
+            min="0"
+            step="0.01"
+            value={activeField === 'discount' ? (discountPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
+            onChange={(e) => {
+              setActiveField('final');
+              setFinalAmountRupees(e.target.value);
+              setDiscountRupees('');
+            }}
+            onFocus={() => {
+              if (activeField !== 'final') {
+                setActiveField('final');
+                setDiscountRupees('');
+              }
+            }}
+            placeholder={preTotalRupees.toFixed(2)}
+            className={`${styles.discountInput} ${activeField === 'final' ? styles.discountInputActive : ''}`}
+            readOnly={activeField === 'discount'}
+          />
+        </div>
+        {discountPaise > 0 && (
+          <button
+            className={styles.discountClear}
+            onClick={() => {
+              setActiveField(null);
+              setDiscountRupees('');
+              setFinalAmountRupees('');
+            }}
+            title="Clear discount"
+          >
+            ✕
+          </button>
+        )}
         {discountPaise > 0 && (
           <span className={styles.discountHint}>split proportionally by share</span>
         )}
@@ -280,7 +348,12 @@ export default function Split({ reviewData, people, assignments, initialDiscount
       </div>
 
       <button
-        onClick={() => onConfirm(splitWithDiscount, discountRupees)}
+        onClick={() => onConfirm(splitWithDiscount, {
+          discount: activeField === 'discount' ? discountRupees : '',
+          finalAmount: activeField === 'final' ? finalAmountRupees : '',
+          field: activeField,
+          discountPaise,
+        })}
         className={styles.confirmBtn}
       >
         Confirm & Continue

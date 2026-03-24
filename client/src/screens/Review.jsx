@@ -117,6 +117,19 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
             />
           </div>
 
+          <div className={styles.dateRow}>
+            <label>Date</label>
+            <input
+              type="date"
+              value={billDate || ''}
+              onChange={(e) => setBillDate(e.target.value || null)}
+              className={styles.dateInput}
+            />
+            {!billDate && (
+              <span className={styles.dateHint}>Not detected — will use today's date</span>
+            )}
+          </div>
+
           <table className={styles.table}>
             <thead>
               <tr>
@@ -303,7 +316,7 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
             <h3>Bill Preview</h3>
             {isPdf ? (
               <iframe
-                src={previewUrl}
+                src={pdfPage ? `${previewUrl}#page=${pdfPage}` : previewUrl}
                 title="Bill preview"
                 className={styles.pdfPreview}
               />
