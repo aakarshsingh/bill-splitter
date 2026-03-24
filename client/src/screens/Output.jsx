@@ -11,7 +11,7 @@ function formatRupees(paise) {
   return rupees.toLocaleString('en-IN');
 }
 
-function buildWhatsAppText(establishment, splitData, grandTotal) {
+function buildWhatsAppText(establishment, splitData, grandTotal, discountLabel) {
   const lines = [];
   if (establishment) {
     lines.push(`*${establishment}*`);
@@ -31,7 +31,7 @@ function buildWhatsAppText(establishment, splitData, grandTotal) {
       lines.push(`  - ${entry.name}${share}: ${formatRupees(entry.amount)}`);
     }
     if (data.discountAmount != null && data.discountAmount > 0) {
-      lines.push(`  - Discount: -${formatRupees(data.discountAmount)}`);
+      lines.push(`  - ${discountLabel}: -${formatRupees(data.discountAmount)}`);
     }
     lines.push('');
   }
@@ -73,6 +73,8 @@ export default function Output({ sessionData, onStartOver }) {
 
   const totalDiscount = splitDiscount?.discountPaise || 0;
   const hasDiscount = totalDiscount > 0;
+  const discountPct = splitDiscount?.pct || '';
+  const discountLabelText = discountPct ? `Discount (${discountPct}%)` : 'Discount';
 
   const sorted = splitData
     ? Object.entries(splitData).sort(
@@ -81,7 +83,7 @@ export default function Output({ sessionData, onStartOver }) {
     : [];
 
   const whatsappText = splitData
-    ? buildWhatsAppText(establishment, splitData, grandTotal)
+    ? buildWhatsAppText(establishment, splitData, grandTotal, discountLabelText)
     : '';
 
   const handleCopy = async () => {
@@ -120,7 +122,7 @@ export default function Output({ sessionData, onStartOver }) {
         instructions,
         assignments,
         splitData,
-        discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal } : null,
+        discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal, pct: discountPct || null } : null,
       };
       const res = await fetch('/api/save', {
         method: 'POST',
@@ -155,7 +157,7 @@ export default function Output({ sessionData, onStartOver }) {
       instructions,
       assignments,
       splitData,
-      discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal } : null,
+      discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal, pct: discountPct || null } : null,
     };
     const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
@@ -222,7 +224,7 @@ export default function Output({ sessionData, onStartOver }) {
                 <td className={styles.subtotalAmount}>{formatPrice(preDiscountTotal)}</td>
               </tr>
               <tr>
-                <td className={styles.discountLabel}>Discount</td>
+                <td className={styles.discountLabel}>{discountLabelText}</td>
                 <td></td>
                 <td className={styles.discountAmount}>-{formatPrice(totalDiscount)}</td>
               </tr>
@@ -340,7 +342,7 @@ export default function Output({ sessionData, onStartOver }) {
               {hasDiscount && data.discountAmount > 0 && (
                 <tfoot>
                   <tr>
-                    <td colSpan={2} className={styles.detailDiscountLabel}>Discount</td>
+                    <td colSpan={2} className={styles.detailDiscountLabel}>{discountLabelText}</td>
                     <td className={styles.detailDiscountAmount}>-{formatPrice(data.discountAmount)}</td>
                   </tr>
                 </tfoot>
@@ -391,7 +393,7 @@ export default function Output({ sessionData, onStartOver }) {
                   <td className={styles.subtotalAmount}>{formatPrice(preDiscountTotal)}</td>
                 </tr>
                 <tr>
-                  <td className={styles.discountLabel}>Discount</td>
+                  <td className={styles.discountLabel}>{discountLabelText}</td>
                   <td></td>
                   <td className={styles.discountAmount}>-{formatPrice(totalDiscount)}</td>
                 </tr>
@@ -442,7 +444,7 @@ export default function Output({ sessionData, onStartOver }) {
               {hasDiscount && data.discountAmount > 0 && (
                 <tfoot>
                   <tr>
-                    <td colSpan={2} className={styles.detailDiscountLabel}>Discount</td>
+                    <td colSpan={2} className={styles.detailDiscountLabel}>{discountLabelText}</td>
                     <td className={styles.detailDiscountAmount}>-{formatPrice(data.discountAmount)}</td>
                   </tr>
                 </tfoot>
