@@ -206,8 +206,12 @@ export default function Split({ reviewData, people, assignments, initialDiscount
             min="0"
             max="100"
             step="0.1"
-            value={locked && locked !== 'pct' ? (discountPaise > 0 ? (discountPaise / preTotalPaise * 100).toFixed(1) : '') : discountPct}
-            onChange={(e) => setDiscountPct(e.target.value)}
+            value={locked && locked !== 'pct' ? (discountPaise > 0 && preTotalPaise > 0 ? (discountPaise / preTotalPaise * 100).toFixed(1) : '') : discountPct}
+            onChange={(e) => {
+              setDiscountPct(e.target.value);
+              setDiscountRupees('');
+              setFinalAmountRupees('');
+            }}
             placeholder="0"
             className={`${styles.discountInput} ${locked === 'pct' ? styles.discountInputActive : ''}`}
             disabled={locked && locked !== 'pct'}
@@ -221,8 +225,12 @@ export default function Split({ reviewData, people, assignments, initialDiscount
             type="number"
             min="0"
             step="0.01"
-            value={locked && locked !== 'discount' ? (discountPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
-            onChange={(e) => setDiscountRupees(e.target.value)}
+            value={locked && locked !== 'discount' ? (discountPaise > 0 && preTotalPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
+            onChange={(e) => {
+              setDiscountRupees(e.target.value);
+              setDiscountPct('');
+              setFinalAmountRupees('');
+            }}
             placeholder="0"
             className={`${styles.discountInput} ${locked === 'discount' ? styles.discountInputActive : ''}`}
             disabled={locked && locked !== 'discount'}
@@ -236,8 +244,12 @@ export default function Split({ reviewData, people, assignments, initialDiscount
             type="number"
             min="0"
             step="0.01"
-            value={locked && locked !== 'final' ? (discountPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
-            onChange={(e) => setFinalAmountRupees(e.target.value)}
+            value={locked && locked !== 'final' ? (discountPaise > 0 && preTotalPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
+            onChange={(e) => {
+              setFinalAmountRupees(e.target.value);
+              setDiscountPct('');
+              setDiscountRupees('');
+            }}
             placeholder={preTotalRupees.toFixed(2)}
             className={`${styles.discountInput} ${locked === 'final' ? styles.discountInputActive : ''}`}
             disabled={locked && locked !== 'final'}
