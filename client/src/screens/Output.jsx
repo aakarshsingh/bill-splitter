@@ -19,15 +19,19 @@ function buildWhatsAppText(establishment, splitData, grandTotal) {
   lines.push('');
 
   const sorted = Object.entries(splitData)
-    .sort(([, a], [, b]) => b.total - a.total);
+    .sort(([, a], [, b]) => (b.adjustedTotal ?? b.total) - (a.adjustedTotal ?? a.total));
 
   for (const [name, data] of sorted) {
-    lines.push(`*${name}*: Rs ${formatRupees(data.total)}`);
+    const finalTotal = data.adjustedTotal ?? data.total;
+    lines.push(`*${name}*: Rs ${formatRupees(finalTotal)}`);
     for (const entry of data.items) {
       const share = entry.parts === entry.totalParts
         ? ''
         : ` (${entry.parts}/${entry.totalParts})`;
       lines.push(`  - ${entry.name}${share}: ${formatRupees(entry.amount)}`);
+    }
+    if (data.discountAmount != null && data.discountAmount > 0) {
+      lines.push(`  - Discount: -${formatRupees(data.discountAmount)}`);
     }
     lines.push('');
   }
@@ -59,11 +63,13 @@ export default function Output({ sessionData, onStartOver }) {
   const exportRef = useRef(null);
 
   const grandTotal = splitData
-    ? Object.values(splitData).reduce((s, d) => s + d.total, 0)
+    ? Object.values(splitData).reduce((s, d) => s + (d.adjustedTotal ?? d.total), 0)
     : 0;
 
   const sorted = splitData
-    ? Object.entries(splitData).sort(([, a], [, b]) => b.total - a.total)
+    ? Object.entries(splitData).sort(
+        ([, a], [, b]) => (b.adjustedTotal ?? b.total) - (a.adjustedTotal ?? a.total)
+      )
     : [];
 
   const whatsappText = splitData
@@ -164,7 +170,7 @@ export default function Output({ sessionData, onStartOver }) {
             <tr key={name}>
               <td className={styles.personCell}>{name}</td>
               <td className={styles.itemsCell}>{data.items.length}</td>
-              <td className={styles.amountCell}>{formatPrice(data.total)}</td>
+              <td className={styles.amountCell}>{formatPrice(data.adjustedTotal ?? data.total)}</td>
             </tr>
           ))}
         </tbody>
@@ -240,7 +246,7 @@ export default function Output({ sessionData, onStartOver }) {
           <div key={name} className={styles.personBlock}>
             <div className={styles.personHeader}>
               <span className={styles.personName}>{name}</span>
-              <span className={styles.personTotal}>{formatPrice(data.total)}</span>
+              <span className={styles.personTotal}>{formatPrice(data.adjustedTotal ?? data.total)}</span>
             </div>
             <table className={styles.detailTable}>
               <thead>
@@ -294,7 +300,7 @@ export default function Output({ sessionData, onStartOver }) {
               <tr key={name}>
                 <td className={styles.personCell}>{name}</td>
                 <td className={styles.itemsCell}>{data.items.length}</td>
-                <td className={styles.amountCell}>{formatPrice(data.total)}</td>
+                <td className={styles.amountCell}>{formatPrice(data.adjustedTotal ?? data.total)}</td>
               </tr>
             ))}
           </tbody>
@@ -310,7 +316,7 @@ export default function Output({ sessionData, onStartOver }) {
           <div key={name} className={styles.personBlock}>
             <div className={styles.personHeader}>
               <span className={styles.personName}>{name}</span>
-              <span className={styles.personTotal}>{formatPrice(data.total)}</span>
+              <span className={styles.personTotal}>{formatPrice(data.adjustedTotal ?? data.total)}</span>
             </div>
             <table className={styles.detailTable}>
               <thead>

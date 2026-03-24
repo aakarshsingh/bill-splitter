@@ -151,8 +151,9 @@ export default function App() {
             reviewData={sessionData.reviewData || { items: [], tax: 0, serviceCharge: 0 }}
             people={sessionData.selectedPeople || []}
             assignments={sessionData.assignments || {}}
-            onConfirm={(splitData) => {
-              updateSession({ splitData });
+            initialDiscount={sessionData.splitDiscount}
+            onConfirm={(splitData, discount) => {
+              updateSession({ splitData, splitDiscount: discount });
               advance(7);
             }}
           />

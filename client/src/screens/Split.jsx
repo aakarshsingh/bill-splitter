@@ -45,21 +45,67 @@ function computeSplit(items, assignments, people, tax, serviceCharge, formulaMod
   return personData;
 }
 
-export default function Split({ reviewData, people, assignments, onConfirm }) {
+export default function Split({ reviewData, people, assignments, initialDiscount, onConfirm }) {
   const { items, tax, serviceCharge, establishment, billTotal, formulaMode } = reviewData;
   const [expandedPerson, setExpandedPerson] = useState(null);
+  const [discountRupees, setDiscountRupees] = useState(initialDiscount || '');
 
   const split = useMemo(
     () => computeSplit(items, assignments, people, tax, serviceCharge, formulaMode),
     [items, assignments, people, tax, serviceCharge, formulaMode]
   );
 
-  const grandTotal = Object.values(split).reduce((s, d) => s + d.total, 0);
-  const billTotalNum = billTotal || 0;
-  const roundingDiff = billTotalNum > 0 ? Math.abs(grandTotal - billTotalNum) : 0;
+  const preTotalPaise = useMemo(
+    () => Object.values(split).reduce((s, d) => s + d.total, 0),
+    [split]
+  );
 
-  // Sort people by total descending
-  const sorted = [...people].sort((a, b) => split[b.name].total - split[a.name].total);
+  const discountPaise = useMemo(() => {
+    const v = Number(discountRupees);
+    if (!v || v <= 0) return 0;
+    const raw = Math.round(v * 100);
+    return raw <= preTotalPaise ? raw : preTotalPaise;
+  }, [discountRupees, preTotalPaise]);
+
+  const splitWithDiscount = useMemo(() => {
+    const names = Object.keys(split);
+    if (discountPaise === 0 || preTotalPaise === 0) {
+      const result = {};
+      for (const name of names) {
+        result[name] = { ...split[name], discountAmount: 0, adjustedTotal: split[name].total };
+      }
+      return result;
+    }
+    // Largest-remainder method for exact paise allocation
+    const exact = names.map((name) => (split[name].total / preTotalPaise) * discountPaise);
+    const floored = exact.map(Math.floor);
+    let residual = discountPaise - floored.reduce((s, v) => s + v, 0);
+    const fractions = exact
+      .map((v, i) => ({ i, frac: v - floored[i] }))
+      .sort((a, b) => b.frac - a.frac);
+    for (let k = 0; k < residual; k++) {
+      floored[fractions[k].i] += 1;
+    }
+    const result = {};
+    names.forEach((name, i) => {
+      const data = split[name];
+      result[name] = { ...data, discountAmount: floored[i], adjustedTotal: data.total - floored[i] };
+    });
+    return result;
+  }, [split, discountPaise, preTotalPaise]);
+
+  const grandTotal = useMemo(
+    () => Object.values(splitWithDiscount).reduce((s, d) => s + d.adjustedTotal, 0),
+    [splitWithDiscount]
+  );
+
+  const billTotalNum = billTotal || 0;
+  const roundingDiff = billTotalNum > 0 ? Math.abs(preTotalPaise - billTotalNum) : 0;
+
+  // Sort people by adjustedTotal descending
+  const sorted = [...people].sort(
+    (a, b) => splitWithDiscount[b.name].adjustedTotal - splitWithDiscount[a.name].adjustedTotal
+  );
 
   const toggleExpand = (name) => {
     setExpandedPerson((prev) => (prev === name ? null : name));
@@ -90,23 +136,61 @@ export default function Split({ reviewData, people, assignments, onConfirm }) {
           <span className={styles.overviewLabel}>SC</span>
           <span className={styles.overviewValue}>{serviceCharge}%</span>
         </div>
-        <div className={styles.overviewItem}>
-          <span className={styles.overviewLabel}>Total</span>
-          <span className={styles.overviewValue}>{formatPrice(grandTotal)}</span>
-        </div>
+        {discountPaise > 0 ? (
+          <>
+            <div className={styles.overviewItem}>
+              <span className={styles.overviewLabel}>Subtotal</span>
+              <span className={styles.overviewValue}>{formatPrice(preTotalPaise)}</span>
+            </div>
+            <div className={styles.overviewItem}>
+              <span className={styles.overviewLabel}>Discount</span>
+              <span className={`${styles.overviewValue} ${styles.discountValue}`}>
+                -{formatPrice(discountPaise)}
+              </span>
+            </div>
+            <div className={styles.overviewItem}>
+              <span className={styles.overviewLabel}>Total</span>
+              <span className={`${styles.overviewValue} ${styles.finalValue}`}>
+                {formatPrice(grandTotal)}
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className={styles.overviewItem}>
+            <span className={styles.overviewLabel}>Total</span>
+            <span className={styles.overviewValue}>{formatPrice(grandTotal)}</span>
+          </div>
+        )}
       </div>
 
       {billTotalNum > 0 && roundingDiff > 100 && (
         <div className={styles.mismatchNote}>
-          Calculated total ({formatPrice(grandTotal)}) differs from bill total ({formatPrice(billTotalNum)}) by {formatPrice(roundingDiff)}
+          Calculated total ({formatPrice(preTotalPaise)}) differs from bill total ({formatPrice(billTotalNum)}) by {formatPrice(roundingDiff)}
         </div>
       )}
 
+      <div className={styles.discountSection}>
+        <label htmlFor="discountInput" className={styles.discountLabel}>Flat Discount (₹)</label>
+        <input
+          id="discountInput"
+          type="number"
+          min="0"
+          step="0.01"
+          value={discountRupees}
+          onChange={(e) => setDiscountRupees(e.target.value)}
+          placeholder="0"
+          className={styles.discountInput}
+        />
+        {discountPaise > 0 && (
+          <span className={styles.discountHint}>split proportionally by share</span>
+        )}
+      </div>
+
       <div className={styles.cards}>
         {sorted.map((p) => {
-          const data = split[p.name];
+          const data = splitWithDiscount[p.name];
           const isExpanded = expandedPerson === p.name;
-          const pct = grandTotal > 0 ? ((data.total / grandTotal) * 100).toFixed(0) : 0;
+          const pct = grandTotal > 0 ? ((data.adjustedTotal / grandTotal) * 100).toFixed(0) : 0;
 
           return (
             <div key={p.name} className={styles.card}>
@@ -121,7 +205,10 @@ export default function Split({ reviewData, people, assignments, onConfirm }) {
                   </span>
                 </div>
                 <div className={styles.cardRight}>
-                  <span className={styles.personTotal}>{formatPrice(data.total)}</span>
+                  {discountPaise > 0 && (
+                    <span className={styles.originalTotal}>{formatPrice(data.total)}</span>
+                  )}
+                  <span className={styles.personTotal}>{formatPrice(data.adjustedTotal)}</span>
                   <span className={styles.personPct}>{pct}%</span>
                 </div>
                 <span className={styles.expandIcon}>{isExpanded ? '\u25B2' : '\u25BC'}</span>
@@ -167,9 +254,21 @@ export default function Split({ reviewData, people, assignments, onConfirm }) {
                       ))}
                     </tbody>
                     <tfoot>
+                      {discountPaise > 0 && (
+                        <>
+                          <tr>
+                            <td colSpan={4} className={styles.bdDiscountLabel}>Subtotal</td>
+                            <td className={styles.bdDiscountSubtotal}>{formatPrice(data.total)}</td>
+                          </tr>
+                          <tr>
+                            <td colSpan={4} className={styles.bdDiscountLabel}>Discount</td>
+                            <td className={styles.bdDiscountAmount}>-{formatPrice(data.discountAmount)}</td>
+                          </tr>
+                        </>
+                      )}
                       <tr>
                         <td colSpan={4} className={styles.bdTotalLabel}>Total</td>
-                        <td className={styles.bdTotalAmount}>{formatPrice(data.total)}</td>
+                        <td className={styles.bdTotalAmount}>{formatPrice(data.adjustedTotal)}</td>
                       </tr>
                     </tfoot>
                   </table>
@@ -181,7 +280,7 @@ export default function Split({ reviewData, people, assignments, onConfirm }) {
       </div>
 
       <button
-        onClick={() => onConfirm(split)}
+        onClick={() => onConfirm(splitWithDiscount, discountRupees)}
         className={styles.confirmBtn}
       >
         Confirm & Continue
