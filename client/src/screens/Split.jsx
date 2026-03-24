@@ -54,7 +54,7 @@ export default function Split({ reviewData, people, assignments, initialDiscount
   const [finalAmountRupees, setFinalAmountRupees] = useState(
     initialDiscount?.finalAmount || ''
   );
-  const [activeField, setActiveField] = useState(
+  const [locked, setLocked] = useState(
     initialDiscount?.field || null
   );
 
@@ -71,9 +71,10 @@ export default function Split({ reviewData, people, assignments, initialDiscount
   const preTotalRupees = preTotalPaise / 100;
 
   const discountPaise = useMemo(() => {
-    if (activeField === 'final') {
+    if (!locked) return 0;
+    if (locked === 'final') {
       const v = Number(finalAmountRupees);
-      if (!v || v <= 0) return preTotalPaise;
+      if (!v || v <= 0) return 0;
       const paid = Math.round(v * 100);
       const disc = preTotalPaise - paid;
       return disc > 0 ? disc : 0;
@@ -82,7 +83,7 @@ export default function Split({ reviewData, people, assignments, initialDiscount
     if (!v || v <= 0) return 0;
     const raw = Math.round(v * 100);
     return raw <= preTotalPaise ? raw : preTotalPaise;
-  }, [activeField, discountRupees, finalAmountRupees, preTotalPaise]);
+  }, [locked, discountRupees, finalAmountRupees, preTotalPaise]);
 
   const splitWithDiscount = useMemo(() => {
     const names = Object.keys(split);
@@ -194,21 +195,11 @@ export default function Split({ reviewData, people, assignments, initialDiscount
             type="number"
             min="0"
             step="0.01"
-            value={activeField === 'final' ? (discountPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
-            onChange={(e) => {
-              setActiveField('discount');
-              setDiscountRupees(e.target.value);
-              setFinalAmountRupees('');
-            }}
-            onFocus={() => {
-              if (activeField !== 'discount') {
-                setActiveField('discount');
-                setFinalAmountRupees('');
-              }
-            }}
+            value={locked === 'final' ? (discountPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
+            onChange={(e) => setDiscountRupees(e.target.value)}
             placeholder="0"
-            className={`${styles.discountInput} ${activeField === 'discount' ? styles.discountInputActive : ''}`}
-            readOnly={activeField === 'final'}
+            className={`${styles.discountInput} ${locked === 'discount' ? styles.discountInputActive : ''}`}
+            disabled={locked === 'final'}
           />
         </div>
         <span className={styles.discountOr}>or</span>
@@ -219,34 +210,42 @@ export default function Split({ reviewData, people, assignments, initialDiscount
             type="number"
             min="0"
             step="0.01"
-            value={activeField === 'discount' ? (discountPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
-            onChange={(e) => {
-              setActiveField('final');
-              setFinalAmountRupees(e.target.value);
-              setDiscountRupees('');
-            }}
-            onFocus={() => {
-              if (activeField !== 'final') {
-                setActiveField('final');
+            value={locked === 'discount' ? (discountPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
+            onChange={(e) => setFinalAmountRupees(e.target.value)}
+            placeholder={preTotalRupees.toFixed(2)}
+            className={`${styles.discountInput} ${locked === 'final' ? styles.discountInputActive : ''}`}
+            disabled={locked === 'discount'}
+          />
+        </div>
+        {!locked && (
+          <button
+            className={styles.discountApply}
+            onClick={() => {
+              const hasDiscount = Number(discountRupees) > 0;
+              const hasFinal = Number(finalAmountRupees) > 0;
+              if (hasDiscount) {
+                setLocked('discount');
+                setFinalAmountRupees('');
+              } else if (hasFinal) {
+                setLocked('final');
                 setDiscountRupees('');
               }
             }}
-            placeholder={preTotalRupees.toFixed(2)}
-            className={`${styles.discountInput} ${activeField === 'final' ? styles.discountInputActive : ''}`}
-            readOnly={activeField === 'discount'}
-          />
-        </div>
-        {discountPaise > 0 && (
+            disabled={!Number(discountRupees) && !Number(finalAmountRupees)}
+          >
+            Apply
+          </button>
+        )}
+        {locked && (
           <button
             className={styles.discountClear}
             onClick={() => {
-              setActiveField(null);
+              setLocked(null);
               setDiscountRupees('');
               setFinalAmountRupees('');
             }}
-            title="Clear discount"
           >
-            ✕
+            Clear
           </button>
         )}
         {discountPaise > 0 && (
@@ -349,9 +348,9 @@ export default function Split({ reviewData, people, assignments, initialDiscount
 
       <button
         onClick={() => onConfirm(splitWithDiscount, {
-          discount: activeField === 'discount' ? discountRupees : '',
-          finalAmount: activeField === 'final' ? finalAmountRupees : '',
-          field: activeField,
+          discount: locked === 'discount' ? discountRupees : '',
+          finalAmount: locked === 'final' ? finalAmountRupees : '',
+          field: locked,
           discountPaise,
         })}
         className={styles.confirmBtn}
