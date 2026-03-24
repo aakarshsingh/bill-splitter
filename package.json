@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node server/index.js",
+    "build": "npm install --prefix client && CI=false npm run build --prefix client",
     "server": "node server/index.js",
     "client": "npm start --prefix client"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -14,6 +19,7 @@
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
+    "pdf-lib": "^1.17.1",
     "uuid": "^11.1.0"
   }
 }

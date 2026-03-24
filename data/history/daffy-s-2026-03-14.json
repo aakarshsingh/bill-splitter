@@ -1,0 +1,676 @@
+{
+  "establishment": "DAFFY'S",
+  "date": "2026-03-13",
+  "billDate": "2026-03-13",
+  "items": [
+    {
+      "id": "97136dc4-1283-45c1-a229-d3849ea2b847",
+      "category": "alcohol",
+      "name": "Bloody Mary",
+      "qty": 1,
+      "unitPrice": 35000
+    },
+    {
+      "id": "693904d7-80cf-45c7-9da4-f943e92c4932",
+      "category": "alcohol",
+      "name": "Bacardi White 30ML",
+      "qty": 1,
+      "unitPrice": 20000
+    },
+    {
+      "id": "1cde0461-1e5b-44c5-93a7-d3df9933fd28",
+      "category": "alcohol",
+      "name": "Hefeweizen 500ml",
+      "qty": 1,
+      "unitPrice": 32500
+    },
+    {
+      "id": "6761feee-9a76-4232-a603-8d02609b7c67",
+      "category": "alcohol",
+      "name": "Wit beer 500ml",
+      "qty": 1,
+      "unitPrice": 32500
+    },
+    {
+      "id": "ed29769f-ba47-4281-a0fc-448bc201e035",
+      "category": "alcohol",
+      "name": "Indian Mead 330ML",
+      "qty": 1,
+      "unitPrice": 25000
+    },
+    {
+      "id": "4a584979-2b27-430a-b4aa-739236d14c57",
+      "category": "food",
+      "name": "Coke",
+      "qty": 2,
+      "unitPrice": 4500
+    },
+    {
+      "id": "fd0713e2-1196-410c-8677-618223f5361c",
+      "category": "food",
+      "name": "Daffy's Bar Bites",
+      "qty": 1,
+      "unitPrice": 18000
+    },
+    {
+      "id": "147dee0c-54bf-44a5-a743-f4516ab0b39d",
+      "category": "food",
+      "name": "Daffy's Chilli Chicken",
+      "qty": 1,
+      "unitPrice": 27000
+    },
+    {
+      "id": "bec2ce4b-410f-4d55-98d1-233c073d130c",
+      "category": "food",
+      "name": "Donne Biryani Chicken",
+      "qty": 1,
+      "unitPrice": 27000
+    },
+    {
+      "id": "01161549-90cf-43f6-ba67-b4116bd3ac1a",
+      "category": "food",
+      "name": "Malabar Parota",
+      "qty": 4,
+      "unitPrice": 4500
+    },
+    {
+      "id": "9156a21b-b0d4-42b0-91a0-0355f21f60f0",
+      "category": "food",
+      "name": "Baby Corn Manchurian",
+      "qty": 1,
+      "unitPrice": 18000
+    },
+    {
+      "id": "cc35dc7d-eb05-4f10-8239-94734f30d9de",
+      "category": "food",
+      "name": "Kerala Veg Stew",
+      "qty": 1,
+      "unitPrice": 29000
+    },
+    {
+      "id": "8d4fddb7-e1bc-4eeb-929a-ceda19cf056f",
+      "category": "food",
+      "name": "Mutton Seekh Kebab",
+      "qty": 1,
+      "unitPrice": 47500
+    }
+  ],
+  "tax": 5,
+  "serviceCharge": 0,
+  "billTotal": 348200,
+  "formulaMode": "indian-gst",
+  "people": [
+    {
+      "id": "4958bf67-818e-4f2f-a3aa-8b70d4046710",
+      "name": "Aakarsh Singh"
+    },
+    {
+      "id": "6b670f51-1e02-42d2-bde1-c3df802fbb6d",
+      "name": "Yamini H Kadakol"
+    },
+    {
+      "id": "da20e1af-c821-4c38-8b42-cb7aa8e6e937",
+      "name": "Tanya Singh"
+    },
+    {
+      "id": "fb8e3d03-4456-46f4-a2a5-203ac5793d52",
+      "name": "Srivatsa Kumar"
+    },
+    {
+      "id": "e74cee9e-0bc9-416f-894e-17920ad90869",
+      "name": "Nikita Thacker"
+    },
+    {
+      "id": "71ddaf3b-dc5d-4d46-acd0-848f07d63832",
+      "name": "Shreya Thacker"
+    }
+  ],
+  "preferences": {
+    "Aakarsh Singh": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer",
+        "wine",
+        "vodka",
+        "cocktails"
+      ]
+    },
+    "Harsh Agarwal": {
+      "diet": "non-veg",
+      "meats": [
+        "seafood",
+        "chicken",
+        "mutton"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Jai Karkhanis": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Madhav Kauntia": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Nikita Thacker": {
+      "diet": "veg",
+      "meats": [],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Poorvi Seth": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken"
+      ],
+      "drinks": [
+        "beer"
+      ]
+    },
+    "Pratistha Prasad": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "seafood"
+      ],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Sai Kiranmayi Varanasi": {
+      "diet": "veg",
+      "meats": [],
+      "drinks": [
+        "gin"
+      ]
+    },
+    "Shreya Thacker": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "seafood"
+      ],
+      "drinks": [
+        "beer",
+        "gin"
+      ]
+    },
+    "Srivatsa Kumar": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton",
+        "pork",
+        "beef"
+      ],
+      "drinks": [
+        "beer",
+        "wine",
+        "whisky"
+      ]
+    },
+    "Tanya Singh": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "pork",
+        "beef",
+        "seafood",
+        "mutton"
+      ],
+      "drinks": [
+        "cocktails",
+        "rum"
+      ]
+    },
+    "Yamini H Kadakol": {
+      "diet": "non-veg",
+      "meats": [
+        "chicken",
+        "mutton"
+      ],
+      "drinks": [
+        "whisky"
+      ]
+    }
+  },
+  "instructions": [
+    "Yamini H Kadakol had the Bloody Mary",
+    "Tanya Singh had Bacardi White 30ML",
+    "Srivatsa Kumar had Hefeweizen 500ml",
+    "Aakarsh Singh had Wit beer 500ml",
+    "Shreya Thacker had Indian Mead 330ML",
+    "Split Coke between Nikita Thacker and Tanya Singh",
+    "Split Daffy's Chilli Chicken between Aakarsh Singh, Yamini H Kadakol and Srivatsa Kumar",
+    "Split Mutton Seekh Kebab between Aakarsh Singh and Srivatsa Kumar",
+    "Split Donne Biryani Chicken - 2 parts to Yamini H Kadakol, 1 part to Aakarsh Singh, 1 part to Srivatsa Kumar",
+    "Split Malabar Parota - 1 to Nikita Thacker, 1.5 to Aakarsh Singh and 1.5 to Srivatsa Kumar",
+    "Baby Corn Manchurian and Kerala Veg Stew to Nikita Thacker"
+  ],
+  "assignments": {
+    "97136dc4-1283-45c1-a229-d3849ea2b847": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 1,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "693904d7-80cf-45c7-9da4-f943e92c4932": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 1,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "1cde0461-1e5b-44c5-93a7-d3df9933fd28": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 1,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "6761feee-9a76-4232-a603-8d02609b7c67": {
+      "Aakarsh Singh": 1,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "ed29769f-ba47-4281-a0fc-448bc201e035": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 1
+    },
+    "4a584979-2b27-430a-b4aa-739236d14c57": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 1,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 1,
+      "Shreya Thacker": 0
+    },
+    "fd0713e2-1196-410c-8677-618223f5361c": {
+      "Aakarsh Singh": 1,
+      "Yamini H Kadakol": 1,
+      "Tanya Singh": 1,
+      "Srivatsa Kumar": 1,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "147dee0c-54bf-44a5-a743-f4516ab0b39d": {
+      "Aakarsh Singh": 1,
+      "Yamini H Kadakol": 1,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 1,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "bec2ce4b-410f-4d55-98d1-233c073d130c": {
+      "Aakarsh Singh": 1,
+      "Yamini H Kadakol": 2,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 1,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    },
+    "01161549-90cf-43f6-ba67-b4116bd3ac1a": {
+      "Aakarsh Singh": 3,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 3,
+      "Nikita Thacker": 2,
+      "Shreya Thacker": 0
+    },
+    "9156a21b-b0d4-42b0-91a0-0355f21f60f0": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 1,
+      "Shreya Thacker": 0
+    },
+    "cc35dc7d-eb05-4f10-8239-94734f30d9de": {
+      "Aakarsh Singh": 0,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 0,
+      "Nikita Thacker": 1,
+      "Shreya Thacker": 0
+    },
+    "8d4fddb7-e1bc-4eeb-929a-ceda19cf056f": {
+      "Aakarsh Singh": 1,
+      "Yamini H Kadakol": 0,
+      "Tanya Singh": 0,
+      "Srivatsa Kumar": 1,
+      "Nikita Thacker": 0,
+      "Shreya Thacker": 0
+    }
+  },
+  "splitData": {
+    "Aakarsh Singh": {
+      "items": [
+        {
+          "itemId": "6761feee-9a76-4232-a603-8d02609b7c67",
+          "name": "Wit beer 500ml",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 32500,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 32500
+        },
+        {
+          "itemId": "fd0713e2-1196-410c-8677-618223f5361c",
+          "name": "Daffy's Bar Bites",
+          "category": "food",
+          "qty": 1,
+          "effective": 18900,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 4725
+        },
+        {
+          "itemId": "147dee0c-54bf-44a5-a743-f4516ab0b39d",
+          "name": "Daffy's Chilli Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 28350,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 9450
+        },
+        {
+          "itemId": "bec2ce4b-410f-4d55-98d1-233c073d130c",
+          "name": "Donne Biryani Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 28350,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 7087.5
+        },
+        {
+          "itemId": "01161549-90cf-43f6-ba67-b4116bd3ac1a",
+          "name": "Malabar Parota",
+          "category": "food",
+          "qty": 4,
+          "effective": 18900,
+          "parts": 3,
+          "totalParts": 8,
+          "fraction": 0.375,
+          "amount": 7087.5
+        },
+        {
+          "itemId": "8d4fddb7-e1bc-4eeb-929a-ceda19cf056f",
+          "name": "Mutton Seekh Kebab",
+          "category": "food",
+          "qty": 1,
+          "effective": 49875,
+          "parts": 1,
+          "totalParts": 2,
+          "fraction": 0.5,
+          "amount": 24937.5
+        }
+      ],
+      "total": 85787.5
+    },
+    "Yamini H Kadakol": {
+      "items": [
+        {
+          "itemId": "97136dc4-1283-45c1-a229-d3849ea2b847",
+          "name": "Bloody Mary",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 35000,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 35000
+        },
+        {
+          "itemId": "fd0713e2-1196-410c-8677-618223f5361c",
+          "name": "Daffy's Bar Bites",
+          "category": "food",
+          "qty": 1,
+          "effective": 18900,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 4725
+        },
+        {
+          "itemId": "147dee0c-54bf-44a5-a743-f4516ab0b39d",
+          "name": "Daffy's Chilli Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 28350,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 9450
+        },
+        {
+          "itemId": "bec2ce4b-410f-4d55-98d1-233c073d130c",
+          "name": "Donne Biryani Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 28350,
+          "parts": 2,
+          "totalParts": 4,
+          "fraction": 0.5,
+          "amount": 14175
+        }
+      ],
+      "total": 63350
+    },
+    "Tanya Singh": {
+      "items": [
+        {
+          "itemId": "693904d7-80cf-45c7-9da4-f943e92c4932",
+          "name": "Bacardi White 30ML",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 20000,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 20000
+        },
+        {
+          "itemId": "4a584979-2b27-430a-b4aa-739236d14c57",
+          "name": "Coke",
+          "category": "food",
+          "qty": 2,
+          "effective": 9450,
+          "parts": 1,
+          "totalParts": 2,
+          "fraction": 0.5,
+          "amount": 4725
+        },
+        {
+          "itemId": "fd0713e2-1196-410c-8677-618223f5361c",
+          "name": "Daffy's Bar Bites",
+          "category": "food",
+          "qty": 1,
+          "effective": 18900,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 4725
+        }
+      ],
+      "total": 29450
+    },
+    "Srivatsa Kumar": {
+      "items": [
+        {
+          "itemId": "1cde0461-1e5b-44c5-93a7-d3df9933fd28",
+          "name": "Hefeweizen 500ml",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 32500,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 32500
+        },
+        {
+          "itemId": "fd0713e2-1196-410c-8677-618223f5361c",
+          "name": "Daffy's Bar Bites",
+          "category": "food",
+          "qty": 1,
+          "effective": 18900,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 4725
+        },
+        {
+          "itemId": "147dee0c-54bf-44a5-a743-f4516ab0b39d",
+          "name": "Daffy's Chilli Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 28350,
+          "parts": 1,
+          "totalParts": 3,
+          "fraction": 0.3333333333333333,
+          "amount": 9450
+        },
+        {
+          "itemId": "bec2ce4b-410f-4d55-98d1-233c073d130c",
+          "name": "Donne Biryani Chicken",
+          "category": "food",
+          "qty": 1,
+          "effective": 28350,
+          "parts": 1,
+          "totalParts": 4,
+          "fraction": 0.25,
+          "amount": 7087.5
+        },
+        {
+          "itemId": "01161549-90cf-43f6-ba67-b4116bd3ac1a",
+          "name": "Malabar Parota",
+          "category": "food",
+          "qty": 4,
+          "effective": 18900,
+          "parts": 3,
+          "totalParts": 8,
+          "fraction": 0.375,
+          "amount": 7087.5
+        },
+        {
+          "itemId": "8d4fddb7-e1bc-4eeb-929a-ceda19cf056f",
+          "name": "Mutton Seekh Kebab",
+          "category": "food",
+          "qty": 1,
+          "effective": 49875,
+          "parts": 1,
+          "totalParts": 2,
+          "fraction": 0.5,
+          "amount": 24937.5
+        }
+      ],
+      "total": 85787.5
+    },
+    "Nikita Thacker": {
+      "items": [
+        {
+          "itemId": "4a584979-2b27-430a-b4aa-739236d14c57",
+          "name": "Coke",
+          "category": "food",
+          "qty": 2,
+          "effective": 9450,
+          "parts": 1,
+          "totalParts": 2,
+          "fraction": 0.5,
+          "amount": 4725
+        },
+        {
+          "itemId": "01161549-90cf-43f6-ba67-b4116bd3ac1a",
+          "name": "Malabar Parota",
+          "category": "food",
+          "qty": 4,
+          "effective": 18900,
+          "parts": 2,
+          "totalParts": 8,
+          "fraction": 0.25,
+          "amount": 4725
+        },
+        {
+          "itemId": "9156a21b-b0d4-42b0-91a0-0355f21f60f0",
+          "name": "Baby Corn Manchurian",
+          "category": "food",
+          "qty": 1,
+          "effective": 18900,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 18900
+        },
+        {
+          "itemId": "cc35dc7d-eb05-4f10-8239-94734f30d9de",
+          "name": "Kerala Veg Stew",
+          "category": "food",
+          "qty": 1,
+          "effective": 30450,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 30450
+        }
+      ],
+      "total": 58800
+    },
+    "Shreya Thacker": {
+      "items": [
+        {
+          "itemId": "ed29769f-ba47-4281-a0fc-448bc201e035",
+          "name": "Indian Mead 330ML",
+          "category": "alcohol",
+          "qty": 1,
+          "effective": 25000,
+          "parts": 1,
+          "totalParts": 1,
+          "fraction": 1,
+          "amount": 25000
+        }
+      ],
+      "total": 25000
+    }
+  }
+}

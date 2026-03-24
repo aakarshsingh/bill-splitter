@@ -80,6 +80,66 @@
   border-bottom: none !important;
 }
 
+.originalAmount {
+  text-decoration: line-through;
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 400;
+  margin-right: 6px;
+}
+
+.subtotalLabel {
+  font-weight: 600;
+  color: #888;
+  padding: 8px 12px !important;
+  border-bottom: none !important;
+}
+
+.subtotalAmount {
+  text-align: right;
+  font-family: monospace;
+  color: #888;
+  padding: 8px 12px !important;
+  border-bottom: none !important;
+}
+
+.discountLabel {
+  font-weight: 600;
+  color: #27ae60;
+  padding: 4px 12px !important;
+  border-bottom: none !important;
+}
+
+.discountAmount {
+  text-align: right;
+  font-family: monospace;
+  font-weight: 600;
+  color: #27ae60;
+  padding: 4px 12px !important;
+  border-bottom: none !important;
+}
+
+.detailDiscountLabel {
+  text-align: right;
+  color: #27ae60;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px !important;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: none !important;
+}
+
+.detailDiscountAmount {
+  text-align: right;
+  font-family: monospace;
+  color: #27ae60;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px !important;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: none !important;
+}
+
 /* Actions */
 .actions {
   display: flex;
@@ -132,6 +192,15 @@
 .exportBtn:disabled {
   background: #b39ddb;
   cursor: default;
+}
+
+.jsonBtn {
+  background: #ff9800;
+  color: #fff;
+}
+
+.jsonBtn:hover {
+  background: #f57c00;
 }
 
 .startOverBtn {

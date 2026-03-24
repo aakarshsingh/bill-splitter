@@ -1,6 +1,7 @@
 const express = require('express');
 const Anthropic = require('@anthropic-ai/sdk');
 const { v4: uuidv4 } = require('uuid');
+const { PDFDocument } = require('pdf-lib');
 
 const router = express.Router();
 const client = new Anthropic();
@@ -33,21 +34,39 @@ Rules:
 
 router.post('/', async (req, res) => {
   try {
-    const { fileData, mimeType } = req.body;
+    const { fileData, mimeType, pageNumber } = req.body;
 
     if (!fileData || !mimeType) {
       return res.status(400).json({ error: 'fileData and mimeType are required' });
     }
 
-    const mediaType = mimeType === 'application/pdf' ? 'application/pdf' : mimeType;
+    let finalData = fileData;
+    let finalMimeType = mimeType;
+
+    // Extract single page from multi-page PDF if pageNumber is specified
+    if (mimeType === 'application/pdf' && pageNumber) {
+      const pdfBytes = Buffer.from(fileData, 'base64');
+      const srcDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+      const pageIndex = pageNumber - 1;
+      if (pageIndex < 0 || pageIndex >= srcDoc.getPageCount()) {
+        return res.status(400).json({ error: `Page ${pageNumber} does not exist. PDF has ${srcDoc.getPageCount()} pages.` });
+      }
+      const newDoc = await PDFDocument.create();
+      const [copiedPage] = await newDoc.copyPages(srcDoc, [pageIndex]);
+      newDoc.addPage(copiedPage);
+      const singlePageBytes = await newDoc.save();
+      finalData = Buffer.from(singlePageBytes).toString('base64');
+    }
+
+    const mediaType = finalMimeType === 'application/pdf' ? 'application/pdf' : finalMimeType;
 
     const content = [
       {
-        type: mimeType === 'application/pdf' ? 'document' : 'image',
+        type: finalMimeType === 'application/pdf' ? 'document' : 'image',
         source: {
           type: 'base64',
           media_type: mediaType,
-          data: fileData,
+          data: finalData,
         },
       },
       {

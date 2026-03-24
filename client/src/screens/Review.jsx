@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './Review.module.css';
 import { FORMULA_MODES, calcItemBreakdown, calcTotal } from '../calcLib';
 
-export default function Review({ file, previewUrl, initialData, onConfirm }) {
+export default function Review({ file, previewUrl, pdfPage, initialData, onConfirm }) {
   const hasInitial = initialData && initialData.items;
   const [items, setItems] = useState(hasInitial ? initialData.items : []);
   const [establishment, setEstablishment] = useState(hasInitial ? initialData.establishment : '');
@@ -32,7 +32,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
           const res = await fetch('/api/parse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileData: base64, mimeType: file.type }),
+            body: JSON.stringify({ fileData: base64, mimeType: file.type, pageNumber: pdfPage || null }),
           });
           if (!res.ok) {
             const err = await res.json();
@@ -115,6 +115,19 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
               onChange={(e) => setEstablishment(e.target.value)}
               className={styles.establishmentInput}
             />
+          </div>
+
+          <div className={styles.dateRow}>
+            <label>Date</label>
+            <input
+              type="date"
+              value={billDate || ''}
+              onChange={(e) => setBillDate(e.target.value || null)}
+              className={styles.dateInput}
+            />
+            {!billDate && (
+              <span className={styles.dateHint}>Not detected — will use today's date</span>
+            )}
           </div>
 
           <table className={styles.table}>
@@ -303,7 +316,7 @@ export default function Review({ file, previewUrl, initialData, onConfirm }) {
             <h3>Bill Preview</h3>
             {isPdf ? (
               <iframe
-                src={previewUrl}
+                src={pdfPage ? `${previewUrl}#page=${pdfPage}` : previewUrl}
                 title="Bill preview"
                 className={styles.pdfPreview}
               />

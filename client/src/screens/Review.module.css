@@ -58,6 +58,34 @@
   font-size: 14px;
 }
 
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dateRow label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+}
+
+.dateInput {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.dateHint {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -130,15 +158,19 @@
 
 .removeBtn {
   background: none;
-  border: none;
-  color: #ccc;
-  font-size: 16px;
+  border: 1px solid transparent;
+  color: #bbb;
+  font-size: 14px;
   cursor: pointer;
   padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
 }
 
 .removeBtn:hover {
   color: #d44;
+  background: #fff5f5;
+  border-color: #fcc;
 }
 
 .addBtn {

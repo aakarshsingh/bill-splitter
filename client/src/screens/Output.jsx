@@ -19,15 +19,19 @@ function buildWhatsAppText(establishment, splitData, grandTotal) {
   lines.push('');
 
   const sorted = Object.entries(splitData)
-    .sort(([, a], [, b]) => b.total - a.total);
+    .sort(([, a], [, b]) => (b.adjustedTotal ?? b.total) - (a.adjustedTotal ?? a.total));
 
   for (const [name, data] of sorted) {
-    lines.push(`*${name}*: Rs ${formatRupees(data.total)}`);
+    const finalTotal = data.adjustedTotal ?? data.total;
+    lines.push(`*${name}*: Rs ${formatRupees(finalTotal)}`);
     for (const entry of data.items) {
       const share = entry.parts === entry.totalParts
         ? ''
         : ` (${entry.parts}/${entry.totalParts})`;
       lines.push(`  - ${entry.name}${share}: ${formatRupees(entry.amount)}`);
+    }
+    if (data.discountAmount != null && data.discountAmount > 0) {
+      lines.push(`  - Discount: -${formatRupees(data.discountAmount)}`);
     }
     lines.push('');
   }
@@ -47,7 +51,8 @@ export default function Output({ sessionData, onStartOver }) {
     historyFilename,
   } = sessionData;
 
-  const { items, tax, serviceCharge, establishment, billDate } = reviewData || {};
+  const { items, tax, serviceCharge, establishment, billDate, formulaMode, billTotal } = reviewData || {};
+  const splitDiscount = sessionData.splitDiscount;
 
   const [saving, setSaving] = useState(false);
   const [saveResult, setSaveResult] = useState(null);
@@ -59,11 +64,20 @@ export default function Output({ sessionData, onStartOver }) {
   const exportRef = useRef(null);
 
   const grandTotal = splitData
+    ? Object.values(splitData).reduce((s, d) => s + (d.adjustedTotal ?? d.total), 0)
+    : 0;
+
+  const preDiscountTotal = splitData
     ? Object.values(splitData).reduce((s, d) => s + d.total, 0)
     : 0;
 
+  const totalDiscount = splitDiscount?.discountPaise || 0;
+  const hasDiscount = totalDiscount > 0;
+
   const sorted = splitData
-    ? Object.entries(splitData).sort(([, a], [, b]) => b.total - a.total)
+    ? Object.entries(splitData).sort(
+        ([, a], [, b]) => (b.adjustedTotal ?? b.total) - (a.adjustedTotal ?? a.total)
+      )
     : [];
 
   const whatsappText = splitData
@@ -106,6 +120,7 @@ export default function Output({ sessionData, onStartOver }) {
         instructions,
         assignments,
         splitData,
+        discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal } : null,
       };
       const res = await fetch('/api/save', {
         method: 'POST',
@@ -123,6 +138,31 @@ export default function Output({ sessionData, onStartOver }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleExportJson = () => {
+    const session = {
+      establishment,
+      date: billDate || new Date().toISOString().slice(0, 10),
+      billDate: billDate || null,
+      items,
+      tax,
+      serviceCharge,
+      billTotal: billTotal || null,
+      formulaMode: formulaMode || 'indian-gst',
+      people: people?.map((p) => ({ id: p.id, name: p.name })),
+      preferences,
+      instructions,
+      assignments,
+      splitData,
+      discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal } : null,
+    };
+    const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.download = `${(establishment || 'bill-split').replace(/\s+/g, '-').toLowerCase()}-${billDate || new Date().toISOString().slice(0, 10)}.json`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
   };
 
   const handleExportImage = async () => {
@@ -164,11 +204,30 @@ export default function Output({ sessionData, onStartOver }) {
             <tr key={name}>
               <td className={styles.personCell}>{name}</td>
               <td className={styles.itemsCell}>{data.items.length}</td>
-              <td className={styles.amountCell}>{formatPrice(data.total)}</td>
+              <td className={styles.amountCell}>
+                {hasDiscount && data.discountAmount > 0 && (
+                  <span className={styles.originalAmount}>{formatPrice(data.total)}</span>
+                )}
+                {formatPrice(data.adjustedTotal ?? data.total)}
+              </td>
             </tr>
           ))}
         </tbody>
         <tfoot>
+          {hasDiscount && (
+            <>
+              <tr>
+                <td className={styles.subtotalLabel}>Subtotal</td>
+                <td></td>
+                <td className={styles.subtotalAmount}>{formatPrice(preDiscountTotal)}</td>
+              </tr>
+              <tr>
+                <td className={styles.discountLabel}>Discount</td>
+                <td></td>
+                <td className={styles.discountAmount}>-{formatPrice(totalDiscount)}</td>
+              </tr>
+            </>
+          )}
           <tr>
             <td className={styles.totalLabel}>Total</td>
             <td></td>
@@ -199,6 +258,13 @@ export default function Output({ sessionData, onStartOver }) {
           disabled={exporting}
         >
           {exporting ? 'Exporting...' : 'Export as Image'}
+        </button>
+
+        <button
+          className={`${styles.actionBtn} ${styles.jsonBtn}`}
+          onClick={handleExportJson}
+        >
+          Export JSON
         </button>
 
         {saveResult && onStartOver && (
@@ -240,7 +306,12 @@ export default function Output({ sessionData, onStartOver }) {
           <div key={name} className={styles.personBlock}>
             <div className={styles.personHeader}>
               <span className={styles.personName}>{name}</span>
-              <span className={styles.personTotal}>{formatPrice(data.total)}</span>
+              <span className={styles.personTotal}>
+                {hasDiscount && data.discountAmount > 0 && (
+                  <span className={styles.originalAmount}>{formatPrice(data.total)}</span>
+                )}
+                {formatPrice(data.adjustedTotal ?? data.total)}
+              </span>
             </div>
             <table className={styles.detailTable}>
               <thead>
@@ -266,6 +337,14 @@ export default function Output({ sessionData, onStartOver }) {
                   </tr>
                 ))}
               </tbody>
+              {hasDiscount && data.discountAmount > 0 && (
+                <tfoot>
+                  <tr>
+                    <td colSpan={2} className={styles.detailDiscountLabel}>Discount</td>
+                    <td className={styles.detailDiscountAmount}>-{formatPrice(data.discountAmount)}</td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         ))}
@@ -294,11 +373,30 @@ export default function Output({ sessionData, onStartOver }) {
               <tr key={name}>
                 <td className={styles.personCell}>{name}</td>
                 <td className={styles.itemsCell}>{data.items.length}</td>
-                <td className={styles.amountCell}>{formatPrice(data.total)}</td>
+                <td className={styles.amountCell}>
+                  {hasDiscount && data.discountAmount > 0 && (
+                    <span className={styles.originalAmount}>{formatPrice(data.total)}</span>
+                  )}
+                  {formatPrice(data.adjustedTotal ?? data.total)}
+                </td>
               </tr>
             ))}
           </tbody>
           <tfoot>
+            {hasDiscount && (
+              <>
+                <tr>
+                  <td className={styles.subtotalLabel}>Subtotal</td>
+                  <td></td>
+                  <td className={styles.subtotalAmount}>{formatPrice(preDiscountTotal)}</td>
+                </tr>
+                <tr>
+                  <td className={styles.discountLabel}>Discount</td>
+                  <td></td>
+                  <td className={styles.discountAmount}>-{formatPrice(totalDiscount)}</td>
+                </tr>
+              </>
+            )}
             <tr>
               <td className={styles.totalLabel}>Total</td>
               <td></td>
@@ -310,7 +408,12 @@ export default function Output({ sessionData, onStartOver }) {
           <div key={name} className={styles.personBlock}>
             <div className={styles.personHeader}>
               <span className={styles.personName}>{name}</span>
-              <span className={styles.personTotal}>{formatPrice(data.total)}</span>
+              <span className={styles.personTotal}>
+                {hasDiscount && data.discountAmount > 0 && (
+                  <span className={styles.originalAmount}>{formatPrice(data.total)}</span>
+                )}
+                {formatPrice(data.adjustedTotal ?? data.total)}
+              </span>
             </div>
             <table className={styles.detailTable}>
               <thead>
@@ -336,6 +439,14 @@ export default function Output({ sessionData, onStartOver }) {
                   </tr>
                 ))}
               </tbody>
+              {hasDiscount && data.discountAmount > 0 && (
+                <tfoot>
+                  <tr>
+                    <td colSpan={2} className={styles.detailDiscountLabel}>Discount</td>
+                    <td className={styles.detailDiscountAmount}>-{formatPrice(data.discountAmount)}</td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         ))}
