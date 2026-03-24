@@ -267,18 +267,53 @@
   background: #fff !important;
 }
 
-.discountClear {
-  background: none;
+.discountInput:disabled {
+  background: #f0f0f0 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+  border-color: #e0e0e0 !important;
+}
+
+.discountApply {
+  padding: 6px 16px;
   border: none;
-  color: #999;
-  font-size: 14px;
+  border-radius: 6px;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 6px;
-  padding-bottom: 8px;
+  white-space: nowrap;
+  align-self: flex-end;
+  margin-bottom: 1px;
+}
+
+.discountApply:hover {
+  background: #3a7bc8;
+}
+
+.discountApply:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.discountClear {
+  padding: 6px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #d44;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: flex-end;
+  margin-bottom: 1px;
 }
 
 .discountClear:hover {
-  color: #d44;
+  background: #fff5f5;
+  border-color: #fcc;
 }
 
 .discountLabel {

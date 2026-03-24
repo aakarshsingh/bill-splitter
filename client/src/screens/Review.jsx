@@ -311,22 +311,14 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
           </button>
         </div>
 
-        {previewUrl && (
+        {previewUrl && !isPdf && (
           <div className={styles.previewSection}>
             <h3>Bill Preview</h3>
-            {isPdf ? (
-              <iframe
-                src={pdfPage ? `${previewUrl}#page=${pdfPage}` : previewUrl}
-                title="Bill preview"
-                className={styles.pdfPreview}
-              />
-            ) : (
-              <img
-                src={previewUrl}
-                alt="Bill preview"
-                className={styles.imagePreview}
-              />
-            )}
+            <img
+              src={previewUrl}
+              alt="Bill preview"
+              className={styles.imagePreview}
+            />
           </div>
         )}
       </div>

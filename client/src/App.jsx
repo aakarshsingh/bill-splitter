@@ -45,6 +45,15 @@ export default function App() {
       instructions: session.instructions || [],
       assignments: session.assignments || {},
       splitData: session.splitData || null,
+      splitDiscount: session.discount
+        ? {
+            discountPaise: session.discount.amount,
+            field: session.discount.pct ? 'pct' : 'discount',
+            pct: session.discount.pct || '',
+            discount: !session.discount.pct ? String((session.discount.amount / 100).toFixed(2)) : '',
+            finalAmount: '',
+          }
+        : null,
       historyFilename: historyFilename || null,
     };
     setSessionData(newSessionData);

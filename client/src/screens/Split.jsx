@@ -48,13 +48,16 @@ function computeSplit(items, assignments, people, tax, serviceCharge, formulaMod
 export default function Split({ reviewData, people, assignments, initialDiscount, onConfirm }) {
   const { items, tax, serviceCharge, establishment, billTotal, formulaMode } = reviewData;
   const [expandedPerson, setExpandedPerson] = useState(null);
+  const [discountPct, setDiscountPct] = useState(
+    initialDiscount?.pct || ''
+  );
   const [discountRupees, setDiscountRupees] = useState(
     initialDiscount?.discount || ''
   );
   const [finalAmountRupees, setFinalAmountRupees] = useState(
     initialDiscount?.finalAmount || ''
   );
-  const [activeField, setActiveField] = useState(
+  const [locked, setLocked] = useState(
     initialDiscount?.field || null
   );
 
@@ -71,9 +74,15 @@ export default function Split({ reviewData, people, assignments, initialDiscount
   const preTotalRupees = preTotalPaise / 100;
 
   const discountPaise = useMemo(() => {
-    if (activeField === 'final') {
+    if (!locked) return 0;
+    if (locked === 'pct') {
+      const v = Number(discountPct);
+      if (!v || v <= 0 || v > 100) return 0;
+      return Math.round(preTotalPaise * v / 100);
+    }
+    if (locked === 'final') {
       const v = Number(finalAmountRupees);
-      if (!v || v <= 0) return preTotalPaise;
+      if (!v || v <= 0) return 0;
       const paid = Math.round(v * 100);
       const disc = preTotalPaise - paid;
       return disc > 0 ? disc : 0;
@@ -82,7 +91,7 @@ export default function Split({ reviewData, people, assignments, initialDiscount
     if (!v || v <= 0) return 0;
     const raw = Math.round(v * 100);
     return raw <= preTotalPaise ? raw : preTotalPaise;
-  }, [activeField, discountRupees, finalAmountRupees, preTotalPaise]);
+  }, [locked, discountPct, discountRupees, finalAmountRupees, preTotalPaise]);
 
   const splitWithDiscount = useMemo(() => {
     const names = Object.keys(split);
@@ -160,7 +169,9 @@ export default function Split({ reviewData, people, assignments, initialDiscount
               <span className={styles.overviewValue}>{formatPrice(preTotalPaise)}</span>
             </div>
             <div className={styles.overviewItem}>
-              <span className={styles.overviewLabel}>Discount</span>
+              <span className={styles.overviewLabel}>
+                {locked === 'pct' ? `Discount (${discountPct}%)` : 'Discount'}
+              </span>
               <span className={`${styles.overviewValue} ${styles.discountValue}`}>
                 -{formatPrice(discountPaise)}
               </span>
@@ -188,65 +199,96 @@ export default function Split({ reviewData, people, assignments, initialDiscount
 
       <div className={styles.discountSection}>
         <div className={styles.discountField}>
+          <label htmlFor="discountPctInput" className={styles.discountLabel}>Discount %</label>
+          <input
+            id="discountPctInput"
+            type="number"
+            min="0"
+            max="100"
+            step="0.1"
+            value={locked && locked !== 'pct' ? (discountPaise > 0 && preTotalPaise > 0 ? (discountPaise / preTotalPaise * 100).toFixed(1) : '') : discountPct}
+            onChange={(e) => {
+              setDiscountPct(e.target.value);
+              setDiscountRupees('');
+              setFinalAmountRupees('');
+            }}
+            placeholder="0"
+            className={`${styles.discountInput} ${locked === 'pct' ? styles.discountInputActive : ''}`}
+            disabled={locked && locked !== 'pct'}
+          />
+        </div>
+        <span className={styles.discountOr}>or</span>
+        <div className={styles.discountField}>
           <label htmlFor="discountInput" className={styles.discountLabel}>Flat Discount (₹)</label>
           <input
             id="discountInput"
             type="number"
             min="0"
             step="0.01"
-            value={activeField === 'final' ? (discountPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
+            value={locked && locked !== 'discount' ? (discountPaise > 0 && preTotalPaise > 0 ? (discountPaise / 100).toFixed(2) : '') : discountRupees}
             onChange={(e) => {
-              setActiveField('discount');
               setDiscountRupees(e.target.value);
+              setDiscountPct('');
               setFinalAmountRupees('');
             }}
-            onFocus={() => {
-              if (activeField !== 'discount') {
-                setActiveField('discount');
-                setFinalAmountRupees('');
-              }
-            }}
             placeholder="0"
-            className={`${styles.discountInput} ${activeField === 'discount' ? styles.discountInputActive : ''}`}
-            readOnly={activeField === 'final'}
+            className={`${styles.discountInput} ${locked === 'discount' ? styles.discountInputActive : ''}`}
+            disabled={locked && locked !== 'discount'}
           />
         </div>
         <span className={styles.discountOr}>or</span>
         <div className={styles.discountField}>
-          <label htmlFor="finalAmountInput" className={styles.discountLabel}>Final Amount Paid (₹)</label>
+          <label htmlFor="finalAmountInput" className={styles.discountLabel}>Final Amount (₹)</label>
           <input
             id="finalAmountInput"
             type="number"
             min="0"
             step="0.01"
-            value={activeField === 'discount' ? (discountPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
+            value={locked && locked !== 'final' ? (discountPaise > 0 && preTotalPaise > 0 ? ((preTotalPaise - discountPaise) / 100).toFixed(2) : '') : finalAmountRupees}
             onChange={(e) => {
-              setActiveField('final');
               setFinalAmountRupees(e.target.value);
+              setDiscountPct('');
               setDiscountRupees('');
             }}
-            onFocus={() => {
-              if (activeField !== 'final') {
-                setActiveField('final');
+            placeholder={preTotalRupees.toFixed(2)}
+            className={`${styles.discountInput} ${locked === 'final' ? styles.discountInputActive : ''}`}
+            disabled={locked && locked !== 'final'}
+          />
+        </div>
+        {!locked && (
+          <button
+            className={styles.discountApply}
+            onClick={() => {
+              if (Number(discountPct) > 0) {
+                setLocked('pct');
+                setDiscountRupees('');
+                setFinalAmountRupees('');
+              } else if (Number(discountRupees) > 0) {
+                setLocked('discount');
+                setDiscountPct('');
+                setFinalAmountRupees('');
+              } else if (Number(finalAmountRupees) > 0) {
+                setLocked('final');
+                setDiscountPct('');
                 setDiscountRupees('');
               }
             }}
-            placeholder={preTotalRupees.toFixed(2)}
-            className={`${styles.discountInput} ${activeField === 'final' ? styles.discountInputActive : ''}`}
-            readOnly={activeField === 'discount'}
-          />
-        </div>
-        {discountPaise > 0 && (
+            disabled={!Number(discountPct) && !Number(discountRupees) && !Number(finalAmountRupees)}
+          >
+            Apply
+          </button>
+        )}
+        {locked && (
           <button
             className={styles.discountClear}
             onClick={() => {
-              setActiveField(null);
+              setLocked(null);
+              setDiscountPct('');
               setDiscountRupees('');
               setFinalAmountRupees('');
             }}
-            title="Clear discount"
           >
-            ✕
+            Clear
           </button>
         )}
         {discountPaise > 0 && (
@@ -348,12 +390,13 @@ export default function Split({ reviewData, people, assignments, initialDiscount
       </div>
 
       <button
-        onClick={() => onConfirm(splitWithDiscount, {
-          discount: activeField === 'discount' ? discountRupees : '',
-          finalAmount: activeField === 'final' ? finalAmountRupees : '',
-          field: activeField,
+        onClick={() => onConfirm(splitWithDiscount, locked ? {
+          pct: locked === 'pct' ? discountPct : '',
+          discount: locked === 'discount' ? discountRupees : '',
+          finalAmount: locked === 'final' ? finalAmountRupees : '',
+          field: locked,
           discountPaise,
-        })}
+        } : null)}
         className={styles.confirmBtn}
       >
         Confirm & Continue
