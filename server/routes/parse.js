@@ -8,7 +8,7 @@ const client = new Anthropic();
 
 const SYSTEM_PROMPT = `You are a bill/receipt parser for Indian restaurants. Extract all line items, tax percentage, service charge percentage, and the bill total.
 
-Return ONLY valid JSON in this exact format, no other text:
+Example of the expected output:
 {
   "establishment": "Name of restaurant/place",
   "date": "2025-01-15",
@@ -31,6 +31,33 @@ Rules:
 - Do NOT include tax, service charge, subtotal, or total as line items.
 - establishment should be the name of the restaurant or place if visible, otherwise "Unknown".
 - date should be the bill date in YYYY-MM-DD format if visible on the receipt. Return null if no date is found.`;
+
+const BILL_SCHEMA = {
+  type: 'object',
+  properties: {
+    establishment: { type: 'string' },
+    date: { type: ['string', 'null'] },
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          qty: { type: 'integer' },
+          unitPrice: { type: 'integer' },
+          category: { type: 'string', enum: ['food', 'alcohol'] },
+        },
+        required: ['name', 'qty', 'unitPrice', 'category'],
+        additionalProperties: false,
+      },
+    },
+    tax: { type: 'number' },
+    serviceCharge: { type: 'number' },
+    billTotal: { type: 'integer' },
+  },
+  required: ['establishment', 'date', 'items', 'tax', 'serviceCharge', 'billTotal'],
+  additionalProperties: false,
+};
 
 router.post('/', async (req, res) => {
   try {
@@ -71,29 +98,39 @@ router.post('/', async (req, res) => {
       },
       {
         type: 'text',
-        text: 'Parse this bill and extract all line items with food/alcohol category, tax %, service charge %, and the bill total. Return only JSON.',
+        text: 'Parse this bill and extract all line items with food/alcohol category, tax %, service charge %, and the bill total.',
       },
     ];
 
     const response = await client.messages.create({
       model: 'claude-sonnet-5-5',
-      max_tokens: 2048,
+      max_tokens: 8192,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content }],
+      output_config: {
+        format: { type: 'json_schema', schema: BILL_SCHEMA },
+      },
     });
 
-    const text = response.content[0].text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return res.status(500).json({ error: 'Failed to parse AI response as JSON' });
+    if (response.stop_reason === 'max_tokens') {
+      return res.status(500).json({ error: 'Response truncated; bill too long' });
+    }
+    if (response.stop_reason === 'refusal') {
+      return res.status(422).json({ error: 'Model declined to parse this file' });
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    // Thinking blocks may come first; read the text block by type
+    const textBlock = response.content.find((b) => b.type === 'text');
+    if (!textBlock) {
+      return res.status(500).json({ error: 'No text in AI response' });
+    }
+
+    const parsed = JSON.parse(textBlock.text);
 
     parsed.items = parsed.items.map((item) => ({
       id: uuidv4(),
-      category: 'food',
       ...item,
+      category: String(item.category).toLowerCase(),
     }));
 
     res.json(parsed);
