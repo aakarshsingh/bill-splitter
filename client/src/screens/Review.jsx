@@ -34,8 +34,11 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
   const [billDate, setBillDate] = useState(hasInitial ? initialData.billDate || null : null);
   const [loading, setLoading] = useState(!hasInitial);
   const [error, setError] = useState(null);
+  // Bill photo is collapsed by default so the table gets the full width
+  const [showPreview, setShowPreview] = useState(false);
 
   const isPdf = file && file.type === 'application/pdf';
+  const hasPreview = previewUrl && !isPdf;
 
   useEffect(() => {
     if (hasInitial) return;
@@ -139,6 +142,14 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
               onChange={(e) => setEstablishment(e.target.value)}
               className={styles.establishmentInput}
             />
+            {hasPreview && (
+              <button
+                onClick={() => setShowPreview((v) => !v)}
+                className={`${styles.previewToggle} ${showPreview ? styles.previewToggleOn : ''}`}
+              >
+                {showPreview ? 'Hide bill' : 'Show bill'}
+              </button>
+            )}
           </div>
 
           <div className={styles.dateRow}>
@@ -154,96 +165,98 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
             )}
           </div>
 
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Type</th>
-                <th>Qty</th>
-                <th>Unit Price</th>
-                <th>SC</th>
-                <th>Tax</th>
-                <th>Effective</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => {
-                const bd = calcItemBreakdown(item, rates);
-                return (
-                  <tr key={item.id} className={bd.overridden ? styles.overrideRow : ''}>
-                    <td>
-                      <input
-                        type="text"
-                        value={item.name}
-                        onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                        className={styles.nameInput}
-                      />
-                    </td>
-                    <td>
-                      <select
-                        value={item.category}
-                        onChange={(e) => updateItem(item.id, 'category', e.target.value)}
-                        className={styles.categorySelect}
-                      >
-                        <option value="food">Food</option>
-                        <option value="alcohol">Alcohol</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.qty}
-                        onChange={(e) =>
-                          updateItem(item.id, 'qty', parseInt(e.target.value) || 1)
-                        }
-                        className={styles.qtyInput}
-                      />
-                    </td>
-                    <td>
-                      <PriceInput
-                        paise={item.unitPrice}
-                        onChange={(v) => updateItem(item.id, 'unitPrice', v)}
-                        className={styles.priceInput}
-                      />
-                    </td>
-                    <td className={styles.calcCol}>{bd.overridden ? '—' : formatPrice(bd.scAmount)}</td>
-                    <td className={styles.calcCol}>{bd.overridden ? '—' : formatPrice(bd.taxAmount)}</td>
-                    <td className={styles.lineTotal}>
-                      <div className={styles.effectiveCell}>
-                        {bd.overridden ? (
-                          <PriceInput
-                            paise={item.effectiveOverride}
-                            onChange={(v) => updateItem(item.id, 'effectiveOverride', v)}
-                            className={styles.overrideInput}
-                            title="Effective price override (incl. all taxes)"
-                          />
-                        ) : (
-                          formatPrice(bd.effective)
-                        )}
-                        <button
-                          onClick={() => toggleOverride(item, bd.effective)}
-                          className={`${styles.overrideBtn} ${bd.overridden ? styles.overrideOn : ''}`}
-                          title={bd.overridden ? 'Remove override — use rates' : 'Override effective price'}
+          <div className={styles.tableScroll}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Type</th>
+                  <th>Qty</th>
+                  <th>Unit Price</th>
+                  <th>SC</th>
+                  <th>Tax</th>
+                  <th>Effective</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => {
+                  const bd = calcItemBreakdown(item, rates);
+                  return (
+                    <tr key={item.id} className={bd.overridden ? styles.overrideRow : ''}>
+                      <td>
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                          className={styles.nameInput}
+                        />
+                      </td>
+                      <td>
+                        <select
+                          value={item.category}
+                          onChange={(e) => updateItem(item.id, 'category', e.target.value)}
+                          className={styles.categorySelect}
                         >
-                          {bd.overridden ? '↺' : '✎'}
+                          <option value="food">Food</option>
+                          <option value="alcohol">Alcohol</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.qty}
+                          onChange={(e) =>
+                            updateItem(item.id, 'qty', parseInt(e.target.value) || 1)
+                          }
+                          className={styles.qtyInput}
+                        />
+                      </td>
+                      <td>
+                        <PriceInput
+                          paise={item.unitPrice}
+                          onChange={(v) => updateItem(item.id, 'unitPrice', v)}
+                          className={styles.priceInput}
+                        />
+                      </td>
+                      <td className={styles.calcCol}>{bd.overridden ? '—' : formatPrice(bd.scAmount)}</td>
+                      <td className={styles.calcCol}>{bd.overridden ? '—' : formatPrice(bd.taxAmount)}</td>
+                      <td className={styles.lineTotal}>
+                        <div className={styles.effectiveCell}>
+                          {bd.overridden ? (
+                            <PriceInput
+                              paise={item.effectiveOverride}
+                              onChange={(v) => updateItem(item.id, 'effectiveOverride', v)}
+                              className={styles.overrideInput}
+                              title="Effective price override (incl. all taxes)"
+                            />
+                          ) : (
+                            formatPrice(bd.effective)
+                          )}
+                          <button
+                            onClick={() => toggleOverride(item, bd.effective)}
+                            className={`${styles.overrideBtn} ${bd.overridden ? styles.overrideOn : ''}`}
+                            title={bd.overridden ? 'Remove override — use rates' : 'Override effective price'}
+                          >
+                            {bd.overridden ? '↺' : '✎'}
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className={styles.removeBtn}
+                        >
+                          x
                         </button>
-                      </div>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className={styles.removeBtn}
-                      >
-                        x
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           <button onClick={addItem} className={styles.addBtn}>
             + Add Item
@@ -337,9 +350,14 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
           </button>
         </div>
 
-        {previewUrl && !isPdf && (
+        {hasPreview && showPreview && (
           <div className={styles.previewSection}>
-            <h3>Bill Preview</h3>
+            <div className={styles.previewHeader}>
+              <h3>Bill Preview</h3>
+              <button onClick={() => setShowPreview(false)} className={styles.previewClose} title="Hide bill">
+                ×
+              </button>
+            </div>
             <img
               src={previewUrl}
               alt="Bill preview"
