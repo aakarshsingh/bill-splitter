@@ -8,61 +8,59 @@
   font-size: 20px;
 }
 
-.loading {
-  text-align: center;
-  padding: 60px 20px;
-  color: #666;
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #eee;
-  border-top-color: #4a90d9;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.error {
-  background: #fff5f5;
-  border: 1px solid #fcc;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  color: #c33;
-  font-size: 14px;
-}
-
-.errorHint {
-  color: #888;
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 13px;
-  margin: 4px 0 0;
 }
 
-.reasoning {
-  background: #f0f7ff;
-  border: 1px solid #d0e3f7;
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: #555;
+.progressBar {
+  width: 120px;
+  height: 6px;
+  border-radius: 3px;
+  background: #eee;
+  overflow: hidden;
 }
 
-.reasoningLabel {
+.progressFill {
+  height: 100%;
+  background: #4a90d9;
+  transition: width 0.2s;
+}
+
+.progressText {
+  color: #e65100;
   font-weight: 600;
-  color: #4a90d9;
+}
+
+.progressDone {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.filterToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .bulkActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
 .bulkBtn {
@@ -75,28 +73,12 @@
   cursor: pointer;
 }
 
-.bulkBtn:hover {
+.bulkBtn:hover:not(:disabled) {
   background: #f5f5f5;
   border-color: #aaa;
 }
 
-.resuggestBtn {
-  padding: 4px 12px;
-  border: 1px solid #d0e3f7;
-  border-radius: 4px;
-  background: #f0f7ff;
-  color: #4a90d9;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.resuggestBtn:hover {
-  background: #d0e3f7;
-  border-color: #4a90d9;
-}
-
-.resuggestBtn:disabled {
+.bulkBtn:disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -212,6 +194,28 @@
 
 .alcohol {
   color: #e65100;
+}
+
+.overrideTag {
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.unitHint {
+  display: block;
+  font-size: 10px;
+  color: #e65100;
+  margin-top: 2px;
+}
+
+.unitHintMatch {
+  color: #2e7d32;
+}
+
+.emptyFilter {
+  text-align: center;
+  color: #2e7d32;
+  padding: 16px !important;
 }
 
 .effCell {
@@ -336,9 +340,14 @@
   margin: 0 2px;
 }
 
-.rowBtn:hover {
+.rowBtn:hover:not(:disabled) {
   border-color: #888;
   color: #333;
+}
+
+.rowBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .rowUnassigned {
@@ -368,29 +377,6 @@
   font-family: monospace;
   font-size: 13px;
   color: #1565c0;
-}
-
-.warnings {
-  background: #fff8e1;
-  border: 1px solid #ffe082;
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: #e65100;
-}
-
-.warningsLabel {
-  font-weight: 600;
-}
-
-.warnings ul {
-  margin: 6px 0 0;
-  padding-left: 20px;
-}
-
-.warnings li {
-  margin: 2px 0;
 }
 
 .shareHelp {

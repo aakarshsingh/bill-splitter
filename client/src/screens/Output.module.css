@@ -166,20 +166,6 @@
   background: #1fba59;
 }
 
-.saveBtn {
-  background: #4a90d9;
-  color: #fff;
-}
-
-.saveBtn:hover {
-  background: #3a7bc8;
-}
-
-.saveBtn:disabled {
-  background: #90b4d9;
-  cursor: default;
-}
-
 .exportBtn {
   background: #7c4dff;
   color: #fff;
@@ -210,16 +196,6 @@
 
 .startOverBtn:hover {
   background: #607d8b;
-}
-
-.error {
-  background: #fff5f5;
-  border: 1px solid #fcc;
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: #c33;
-  font-size: 13px;
-  margin-bottom: 16px;
 }
 
 /* WhatsApp preview */

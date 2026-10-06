@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './Assign.module.css';
-import { calcEffective } from '../calcLib';
+import { calcEffective, hasOverride } from '../calcLib';
 
 function formatPrice(paise) {
   return (paise / 100).toFixed(2);
@@ -10,177 +10,83 @@ function formatPrice(paise) {
 // "parts" is an integer — how many shares this person has of the item.
 // The fraction each person pays = parts / totalParts for that item.
 
+function sumParts(itemParts) {
+  return Object.values(itemParts || {}).reduce((s, v) => s + v, 0);
+}
+
+function buildRow(people, partsFor) {
+  const row = {};
+  for (const p of people) row[p.name] = partsFor(p);
+  return row;
+}
+
 function buildEmptyParts(items, people) {
   const map = {};
-  for (const item of items) {
-    map[item.id] = {};
-    for (const p of people) {
-      map[item.id][p.name] = 0;
-    }
-  }
+  for (const item of items) map[item.id] = buildRow(people, () => 0);
   return map;
 }
 
-function partsFromAI(aiResult, items, people) {
-  const map = buildEmptyParts(items, people);
-  const aiMap = aiResult.assignments || {};
-  for (const itemId of Object.keys(aiMap)) {
-    if (!map[itemId]) continue;
-    const entries = aiMap[itemId];
-    for (const entry of entries) {
-      if (map[itemId][entry.person] === undefined) continue;
-      // Parse share string like "1/3" or "1" into a parts count
-      const share = entry.share?.trim();
-      if (!share) continue;
-      if (share.includes('/')) {
-        const [num] = share.split('/').map(Number);
-        map[itemId][entry.person] = isNaN(num) ? 0 : num;
-      } else {
-        const n = parseFloat(share);
-        map[itemId][entry.person] = isNaN(n) ? 0 : (n === 1 ? 1 : Math.round(n * 10));
-      }
-    }
-  }
-  return map;
-}
+export default function Assign({ reviewData, people, initialAssignments, onConfirm }) {
+  const { items, rates } = reviewData;
 
-// Convert parts map to the fraction-based format for passing downstream
-function partsToAssignments(partsMap) {
-  const result = {};
-  for (const itemId of Object.keys(partsMap)) {
-    const personParts = partsMap[itemId];
-    const total = Object.values(personParts).reduce((s, v) => s + v, 0);
-    result[itemId] = [];
-    for (const [person, parts] of Object.entries(personParts)) {
-      if (parts > 0 && total > 0) {
-        result[itemId].push({ person, share: `${parts}/${total}` });
-      }
-    }
-  }
-  return result;
-}
+  const [parts, setParts] = useState(() => initialAssignments || buildEmptyParts(items, people));
+  const [unassignedOnly, setUnassignedOnly] = useState(false);
 
-export default function Assign({
-  reviewData,
-  people,
-  preferences,
-  instructions,
-  initialAssignments,
-  isTestMode,
-  testAssignments,
-  onConfirm,
-}) {
-  const { items, tax, serviceCharge, formulaMode } = reviewData;
+  const setRow = (itemId, row) => setParts((prev) => ({ ...prev, [itemId]: row }));
 
-  const [parts, setParts] = useState(() => {
-    if (initialAssignments) return initialAssignments;
-    return buildEmptyParts(items, people);
-  });
-  const [reasoning, setReasoning] = useState('');
-  const [loading, setLoading] = useState(!initialAssignments);
-  const [error, setError] = useState(null);
-
-  const fetchFromAI = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      if (isTestMode && testAssignments) {
-        setParts(partsFromAI(testAssignments, items, people));
-        setReasoning(testAssignments.reasoning || '');
-        return;
-      }
-      const res = await fetch('/api/assign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, people, instructions, preferences }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to get assignments');
-      }
-      const data = await res.json();
-      setParts(partsFromAI(data, items, people));
-      setReasoning(data.reasoning || '');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (initialAssignments) return;
-    fetchFromAI();
-  }, []);
-
-  const increment = (itemId, personName) => {
-    setParts((prev) => ({
-      ...prev,
-      [itemId]: { ...prev[itemId], [personName]: (prev[itemId][personName] || 0) + 1 },
-    }));
-  };
-
-  const decrement = (itemId, personName) => {
-    setParts((prev) => ({
-      ...prev,
-      [itemId]: { ...prev[itemId], [personName]: Math.max(0, (prev[itemId][personName] || 0) - 1) },
-    }));
-  };
-
-  const splitEqual = (itemId) => {
+  const adjust = (itemId, personName, delta) => {
     setParts((prev) => {
-      const updated = { ...prev[itemId] };
-      for (const p of people) updated[p.name] = 1;
-      return { ...prev, [itemId]: updated };
+      const row = prev[itemId] || {};
+      return { ...prev, [itemId]: { ...row, [personName]: Math.max(0, (row[personName] || 0) + delta) } };
     });
   };
 
-  const assignSolo = (itemId, personName) => {
+  // Count button toggles a person in/out of an item without touching others
+  const toggle = (itemId, personName) => {
     setParts((prev) => {
-      const updated = {};
-      for (const p of people) updated[p.name] = p.name === personName ? 1 : 0;
-      return { ...prev, [itemId]: updated };
+      const row = prev[itemId] || {};
+      return { ...prev, [itemId]: { ...row, [personName]: row[personName] > 0 ? 0 : 1 } };
     });
   };
 
-  const clearItem = (itemId) => {
-    setParts((prev) => {
-      const updated = {};
-      for (const p of people) updated[p.name] = 0;
-      return { ...prev, [itemId]: updated };
-    });
+  const splitEqual = (itemId) => setRow(itemId, buildRow(people, () => 1));
+  const clearItem = (itemId) => setRow(itemId, buildRow(people, () => 0));
+
+  const copyFromAbove = (index) => {
+    const prevItem = items[index - 1];
+    setRow(items[index].id, buildRow(people, (p) => (parts[prevItem.id] || {})[p.name] || 0));
   };
 
   const splitAllEqual = () => {
     const updated = {};
-    for (const item of items) {
-      updated[item.id] = {};
-      for (const p of people) updated[item.id][p.name] = 1;
-    }
+    for (const item of items) updated[item.id] = buildRow(people, () => 1);
     setParts(updated);
+  };
+
+  const splitRemainingEqual = () => {
+    setParts((prev) => {
+      const updated = { ...prev };
+      for (const item of items) {
+        if (sumParts(prev[item.id]) === 0) updated[item.id] = buildRow(people, () => 1);
+      }
+      return updated;
+    });
   };
 
   const clearAll = () => {
     setParts(buildEmptyParts(items, people));
   };
 
-  // Validation
-  const warnings = [];
-  for (const item of items) {
-    const itemParts = parts[item.id] || {};
-    const total = Object.values(itemParts).reduce((s, v) => s + v, 0);
-    if (total === 0) {
-      warnings.push(`"${item.name}" has no one assigned`);
-    }
-  }
+  const unassignedCount = items.filter((item) => sumParts(parts[item.id]) === 0).length;
+  const assignedCount = items.length - unassignedCount;
 
   // Per-person totals
   const personTotals = {};
   for (const p of people) personTotals[p.name] = 0;
   for (const item of items) {
-    const eff = calcEffective(item, tax, serviceCharge, formulaMode);
+    const eff = calcEffective(item, rates);
     const itemParts = parts[item.id] || {};
-    const totalParts = Object.values(itemParts).reduce((s, v) => s + v, 0);
+    const totalParts = sumParts(itemParts);
     if (totalParts === 0) continue;
     for (const p of people) {
       const pp = itemParts[p.name] || 0;
@@ -189,46 +95,42 @@ export default function Assign({
   }
   const grandTotal = Object.values(personTotals).reduce((s, v) => s + v, 0);
 
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.spinner} />
-        <p>Getting AI assignment suggestions...</p>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Assign Items</h2>
 
-      {error && (
-        <div className={styles.error}>
-          <p>AI suggestion failed: {error}</p>
-          <p className={styles.errorHint}>You can assign items manually below.</p>
+      <div className={styles.toolbar}>
+        <div className={styles.progress}>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${items.length ? (assignedCount / items.length) * 100 : 0}%` }}
+            />
+          </div>
+          <span className={unassignedCount === 0 ? styles.progressDone : styles.progressText}>
+            {assignedCount}/{items.length} assigned
+          </span>
+          <label className={styles.filterToggle}>
+            <input
+              type="checkbox"
+              checked={unassignedOnly}
+              onChange={(e) => setUnassignedOnly(e.target.checked)}
+            />
+            Unassigned only
+          </label>
         </div>
-      )}
 
-      {reasoning && !error && (
-        <div className={styles.reasoning}>
-          <span className={styles.reasoningLabel}>AI reasoning:</span> {reasoning}
+        <div className={styles.bulkActions}>
+          <button className={styles.bulkBtn} onClick={splitRemainingEqual} disabled={unassignedCount === 0}>
+            Split remaining equally
+          </button>
+          <button className={styles.bulkBtn} onClick={splitAllEqual}>
+            Split all equally
+          </button>
+          <button className={styles.bulkBtn} onClick={clearAll}>
+            Clear all
+          </button>
         </div>
-      )}
-
-      <div className={styles.bulkActions}>
-        <button className={styles.bulkBtn} onClick={splitAllEqual}>
-          Split all equally
-        </button>
-        <button className={styles.bulkBtn} onClick={clearAll}>
-          Clear all
-        </button>
-        <button
-          className={styles.resuggestBtn}
-          onClick={fetchFromAI}
-          disabled={loading}
-        >
-          {loading ? 'Suggesting...' : 'Re-suggest with AI'}
-        </button>
       </div>
 
       <div className={styles.tableWrap}>
@@ -246,11 +148,12 @@ export default function Assign({
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => {
-              const eff = calcEffective(item, tax, serviceCharge, formulaMode);
+            {items.map((item, index) => {
+              const eff = calcEffective(item, rates);
               const itemParts = parts[item.id] || {};
-              const totalParts = Object.values(itemParts).reduce((s, v) => s + v, 0);
-              const assignedCount = Object.values(itemParts).filter((v) => v > 0).length;
+              const totalParts = sumParts(itemParts);
+              if (unassignedOnly && totalParts > 0) return null;
+              const unitsMatch = item.qty > 1 && totalParts === item.qty;
 
               return (
                 <tr key={item.id} className={totalParts === 0 ? styles.rowUnassigned : ''}>
@@ -258,17 +161,24 @@ export default function Assign({
                     <span className={styles.itemName}>{item.name}</span>
                     <span className={`${styles.itemMeta} ${item.category === 'alcohol' ? styles.alcohol : ''}`}>
                       {item.category} · qty {item.qty}
+                      {hasOverride(item) && <span className={styles.overrideTag}> · override</span>}
                     </span>
+                    {item.qty > 1 && totalParts > 0 && (
+                      <span className={`${styles.unitHint} ${unitsMatch ? styles.unitHintMatch : ''}`}>
+                        {unitsMatch ? 'parts = units' : `${totalParts} parts · ${item.qty} units`}
+                      </span>
+                    )}
                   </td>
                   <td className={styles.effCell}>{formatPrice(eff)}</td>
                   {people.map((p) => {
                     const pp = itemParts[p.name] || 0;
                     const isActive = pp > 0;
-                    const fraction = isActive && totalParts > 0
-                      ? (pp === totalParts ? 'all' : `${pp}/${totalParts}`)
-                      : null;
-                    const amount = isActive && totalParts > 0
-                      ? formatPrice(eff * pp / totalParts)
+                    const fraction = isActive
+                      ? pp === totalParts
+                        ? 'all'
+                        : unitsMatch
+                          ? `${pp} of ${item.qty}`
+                          : `${pp}/${totalParts}`
                       : null;
 
                     return (
@@ -276,38 +186,41 @@ export default function Assign({
                         <div className={`${styles.shareBox} ${isActive ? styles.shareActive : ''}`}>
                           <button
                             className={styles.shareBtn}
-                            onClick={() => decrement(item.id, p.name)}
+                            onClick={() => adjust(item.id, p.name, -1)}
                             disabled={pp === 0}
                           >
                             -
                           </button>
                           <button
                             className={styles.shareCount}
-                            onClick={() => {
-                              if (pp === 0) assignSolo(item.id, p.name);
-                              else decrement(item.id, p.name);
-                            }}
-                            title={pp === 0 ? 'Assign solely' : 'Decrease'}
+                            onClick={() => toggle(item.id, p.name)}
+                            title={pp === 0 ? `Add ${p.name}` : `Remove ${p.name}`}
                           >
                             {pp}
                           </button>
                           <button
                             className={styles.shareBtn}
-                            onClick={() => increment(item.id, p.name)}
+                            onClick={() => adjust(item.id, p.name, 1)}
                           >
                             +
                           </button>
                         </div>
-                        {fraction && (
-                          <div className={styles.shareFraction}>{fraction}</div>
-                        )}
-                        {amount && (
-                          <div className={styles.shareAmount}>{amount}</div>
+                        {fraction && <div className={styles.shareFraction}>{fraction}</div>}
+                        {isActive && (
+                          <div className={styles.shareAmount}>{formatPrice(eff * pp / totalParts)}</div>
                         )}
                       </td>
                     );
                   })}
                   <td className={styles.actionsCell}>
+                    <button
+                      className={styles.rowBtn}
+                      onClick={() => copyFromAbove(index)}
+                      disabled={index === 0}
+                      title="Same as above"
+                    >
+                      ↑
+                    </button>
                     <button
                       className={styles.rowBtn}
                       onClick={() => splitEqual(item.id)}
@@ -326,6 +239,13 @@ export default function Assign({
                 </tr>
               );
             })}
+            {unassignedOnly && unassignedCount === 0 && (
+              <tr>
+                <td colSpan={people.length + 3} className={styles.emptyFilter}>
+                  Everything is assigned.
+                </td>
+              </tr>
+            )}
           </tbody>
           <tfoot>
             <tr className={styles.totalRow}>
@@ -342,31 +262,20 @@ export default function Assign({
         </table>
       </div>
 
-      {warnings.length > 0 && (
-        <div className={styles.warnings}>
-          <span className={styles.warningsLabel}>Warnings:</span>
-          <ul>
-            {warnings.map((w, i) => (
-              <li key={i}>{w}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <div className={styles.shareHelp}>
         <span className={styles.helpLabel}>How it works:</span>{' '}
-        Use <strong>+</strong>/<strong>-</strong> to adjust each person's share of an item.
-        Shares are proportional — if two people each have 1 part, they split 50/50.
-        Give someone 2 parts and others 1 to make them pay double.
-        Click the number to quickly assign an item to one person.
+        Tap a number to add or remove that person. Use <strong>+</strong>/<strong>-</strong> to weight
+        shares — 2 parts vs 1 part pays double. For items with qty &gt; 1, set parts to units
+        (e.g. 6 shots: 4 + 2). <strong>↑</strong> copies the split from the row above,
+        <strong> =</strong> splits equally, <strong>x</strong> clears the row.
       </div>
 
       <button
         onClick={() => onConfirm(parts)}
         className={styles.confirmBtn}
-        disabled={warnings.length > 0}
+        disabled={unassignedCount > 0}
       >
-        {warnings.length > 0 ? `Fix ${warnings.length} warning(s) to continue` : 'Confirm & Continue'}
+        {unassignedCount > 0 ? `Assign ${unassignedCount} more item(s) to continue` : 'Confirm & Continue'}
       </button>
     </div>
   );

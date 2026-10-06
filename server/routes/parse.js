@@ -6,31 +6,53 @@ const { PDFDocument } = require('pdf-lib');
 const router = express.Router();
 const client = new Anthropic();
 
-const SYSTEM_PROMPT = `You are a bill/receipt parser for Indian restaurants. Extract all line items, tax percentage, service charge percentage, and the bill total.
+const SYSTEM_PROMPT = `You are a bill/receipt parser for Indian restaurants and bars. Extract every line item, the tax and service charge rates per category (food vs alcohol), and the bill total.
 
 Example of the expected output:
 {
   "establishment": "Name of restaurant/place",
   "date": "2025-01-15",
   "items": [
-    { "name": "Item name", "qty": 1, "unitPrice": 450, "category": "food" }
+    { "name": "Item name", "qty": 2, "unitPrice": 27500, "category": "alcohol" }
   ],
-  "tax": 5,
-  "serviceCharge": 10,
-  "billTotal": 52500
+  "rates": {
+    "food": { "sc": 10, "tax": 5, "scTax": 5 },
+    "alcohol": { "sc": 10, "tax": 0, "scTax": 5 }
+  },
+  "billTotal": 487100
 }
 
-Rules:
-- unitPrice must be in the smallest currency unit (paise). If the bill shows 4.50, return 450. If the bill shows 450 (rupees), return 45000.
-- qty should be the quantity for that line item. Default to 1 if not clear.
-- unitPrice is the price for ONE unit, not the line total. If line shows "2x Pizza 900", unitPrice should be 45000 (450 rupees in paise).
-- category must be either "food" or "alcohol". Classify beer, wine, whisky, vodka, gin, rum, cocktails, IMFL, spirits, champagne, sake, and similar drinks as "alcohol". Everything else (including non-alcoholic beverages, mocktails, soft drinks, water, juice, tea, coffee) is "food".
-- tax is the tax/GST percentage (e.g. 5 for 5%). Return 0 if no tax found. In India this is typically 5% for dine-in restaurants.
-- serviceCharge is the service charge percentage (e.g. 10 for 10%). Return 0 if no service charge found.
-- billTotal is the final total amount on the bill in paise (the amount the customer pays). This is critical for reconciliation.
-- Do NOT include tax, service charge, subtotal, or total as line items.
-- establishment should be the name of the restaurant or place if visible, otherwise "Unknown".
-- date should be the bill date in YYYY-MM-DD format if visible on the receipt. Return null if no date is found.`;
+Line items:
+- unitPrice is the price of ONE unit in paise (smallest currency unit). 450 rupees -> 45000; 4.50 -> 450.
+- Receipts often print the LINE TOTAL in the amount column. If qty is 2 and the amount is 550.00, unitPrice is 27500. Check: the sum of qty × unitPrice across items should equal the receipt's subtotal.
+- qty defaults to 1 if unclear.
+- category is "alcohol" for beer, wine, whisky, vodka, gin, rum, cocktails, shots, IMFL, spirits, champagne, sake, and similar. Everything else (food, soft drinks, mocktails, water, juice, tea, coffee) is "food".
+- Some receipts print a zero-priced parent line with priced sub-lines (e.g. "Half & Half Pizza 0.00" then "- Tartofu 337.50", "- Pepperoni 412.50"). Omit the zero-priced parent and keep the priced sub-lines as items. Omit any other zero-priced lines.
+- Do NOT include tax, service charge, discounts, round-off, subtotal, or total as items.
+
+Rates (all percentages, per category):
+- sc: service charge % applied to that category's base price. Usually the same for both categories; 0 if none.
+- tax: tax % applied to that category's base price. Add split taxes together (CGST 2.5% + SGST 2.5% -> 5).
+- scTax: tax % applied to the service charge amount (GST is usually also charged on service charge). 0 if no service charge.
+- Decide which category each tax line applies to from the AMOUNTS, not the label: divide the tax amount by its rate to get the taxable base, and compare it with the food subtotal and the alcohol subtotal. Labels like "F&B" or "GST" are unreliable.
+- VAT on liquor (e.g. "VAT 22%") is alcohol tax. In many states alcohol prices already include tax, so alcohol tax is 0 when no tax line covers the alcohol subtotal.
+- Typical patterns: Karnataka — food tax 5, alcohol tax 0. Goa — food tax 5, alcohol tax 22 (VAT). Restaurants with service charge — sc 10 on both, scTax equal to the GST rate.
+
+Other fields:
+- billTotal is the final amount the customer pays, in paise, after any round-off.
+- establishment is the restaurant or place name if visible, otherwise "Unknown".
+- date is the bill date in YYYY-MM-DD if visible, otherwise null.`;
+
+const RATE_SCHEMA = {
+  type: 'object',
+  properties: {
+    sc: { type: 'number' },
+    tax: { type: 'number' },
+    scTax: { type: 'number' },
+  },
+  required: ['sc', 'tax', 'scTax'],
+  additionalProperties: false,
+};
 
 const BILL_SCHEMA = {
   type: 'object',
@@ -51,11 +73,18 @@ const BILL_SCHEMA = {
         additionalProperties: false,
       },
     },
-    tax: { type: 'number' },
-    serviceCharge: { type: 'number' },
+    rates: {
+      type: 'object',
+      properties: {
+        food: RATE_SCHEMA,
+        alcohol: RATE_SCHEMA,
+      },
+      required: ['food', 'alcohol'],
+      additionalProperties: false,
+    },
     billTotal: { type: 'integer' },
   },
-  required: ['establishment', 'date', 'items', 'tax', 'serviceCharge', 'billTotal'],
+  required: ['establishment', 'date', 'items', 'rates', 'billTotal'],
   additionalProperties: false,
 };
 
@@ -98,12 +127,16 @@ router.post('/', async (req, res) => {
       },
       {
         type: 'text',
-        text: 'Parse this bill and extract all line items with food/alcohol category, tax %, service charge %, and the bill total.',
+        text: 'Parse this bill: line items with food/alcohol category, per-category tax and service charge rates, and the bill total.',
       },
     ];
 
-    const response = await client.messages.create({
+    // Server-side fallback: a safety-classifier decline is retried on
+    // Anthropic's recommended model for that category within the same call.
+    const response = await client.beta.messages.create({
       model: 'claude-sonnet-5-5',
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
       max_tokens: 8192,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content }],

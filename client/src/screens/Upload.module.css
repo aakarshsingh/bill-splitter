@@ -217,56 +217,100 @@
   margin-top: 12px;
 }
 
-/* Past sessions */
-.historySection {
+/* Camera */
+.cameraBtn {
+  margin-top: 12px;
   width: 100%;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-
-.historyTitle {
+  padding: 12px;
+  border: 2px solid #4a90d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #4a90d9;
   font-size: 15px;
-  color: #666;
-  margin: 0 0 12px;
   font-weight: 600;
+  cursor: pointer;
 }
 
-.historyList {
+.cameraBtn:hover {
+  background: #f0f7ff;
+}
+
+.cameraOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cameraModal {
+  width: 100%;
+  height: 100%;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-.historyItem {
+.cameraVideo {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.cameraError {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background: #fafafa;
+  justify-content: center;
+  color: #fff;
+  padding: 24px;
+  text-align: center;
+}
+
+.cameraControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
+}
+
+.cameraCancel,
+.cameraSpacer {
+  width: 80px;
+}
+
+.cameraCancel {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
   cursor: pointer;
   text-align: left;
-  font-size: 13px;
-  color: #555;
 }
 
-.historyItem:hover:not(:disabled) {
-  background: #f0f7ff;
-  border-color: #c0d8f0;
+.cameraShutter {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: none;
+  padding: 4px;
+  cursor: pointer;
 }
 
-.historyItem:disabled {
-  opacity: 0.6;
+.cameraShutter:disabled {
+  opacity: 0.4;
   cursor: default;
 }
 
-.historyName {
-  text-transform: capitalize;
-}
-
-.historyLoading {
-  font-size: 12px;
-  color: #4a90d9;
+.cameraShutterInner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
 }

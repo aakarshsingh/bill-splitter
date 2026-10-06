@@ -1,10 +1,81 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import styles from './Upload.module.css';
+import { captureVideoFrame } from '../imageUtils';
 
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/json'];
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'application/json'];
 
-export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLoadSession }) {
+// Live camera needs a secure context (https or localhost). Elsewhere — e.g. a
+// phone hitting the dev server over LAN — fall back to the OS camera picker.
+const canUseLiveCamera = () =>
+  typeof window !== 'undefined' && window.isSecureContext && !!navigator.mediaDevices?.getUserMedia;
+
+function CameraModal({ onCapture, onClose }) {
+  const videoRef = useRef();
+  const [error, setError] = useState(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let stream;
+    let cancelled = false;
+    navigator.mediaDevices
+      .getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 3840 }, height: { ideal: 2160 } },
+        audio: false,
+      })
+      .then((s) => {
+        if (cancelled) {
+          s.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        stream = s;
+        videoRef.current.srcObject = s;
+      })
+      .catch((err) => setError(err.name === 'NotAllowedError' ? 'Camera permission denied.' : err.message));
+    return () => {
+      cancelled = true;
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
+  const capture = async () => {
+    try {
+      onCapture(await captureVideoFrame(videoRef.current));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className={styles.cameraOverlay}>
+      <div className={styles.cameraModal}>
+        {error ? (
+          <p className={styles.cameraError}>{error}</p>
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            onLoadedMetadata={() => setReady(true)}
+            className={styles.cameraVideo}
+          />
+        )}
+        <div className={styles.cameraControls}>
+          <button onClick={onClose} className={styles.cameraCancel}>Cancel</button>
+          {!error && (
+            <button onClick={capture} className={styles.cameraShutter} disabled={!ready} aria-label="Capture">
+              <span className={styles.cameraShutterInner} />
+            </button>
+          )}
+          <span className={styles.cameraSpacer} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function Upload({ initialFile, initialPreviewUrl, onConfirm }) {
   const [file, setFile] = useState(initialFile || null);
   const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || null);
   const [error, setError] = useState(null);
@@ -12,21 +83,12 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
   const [pdfPageCount, setPdfPageCount] = useState(0);
   const [selectedPage, setSelectedPage] = useState(1);
   const inputRef = useRef();
-
-  const [history, setHistory] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-  const [loadingFile, setLoadingFile] = useState(null);
-
-  useEffect(() => {
-    fetch('/api/load')
-      .then((r) => r.ok ? r.json() : [])
-      .then((files) => setHistory(files))
-      .catch(() => {});
-  }, []);
+  const captureInputRef = useRef();
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const handleFile = useCallback(async (f) => {
     if (!ACCEPTED_TYPES.includes(f.type)) {
-      setError('Please upload a JPG, PNG, PDF, or JSON file.');
+      setError('Please upload a JPG, PNG, WebP, PDF, or JSON file.');
       return;
     }
     setError(null);
@@ -71,6 +133,16 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
     if (f) handleFile(f);
   };
 
+  const openCamera = () => {
+    if (canUseLiveCamera()) setCameraOpen(true);
+    else captureInputRef.current.click();
+  };
+
+  const handleCapture = (f) => {
+    setCameraOpen(false);
+    handleFile(f);
+  };
+
   const handleRemove = () => {
     setFile(null);
     setPreviewUrl(null);
@@ -78,28 +150,6 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
     setPdfPageCount(0);
     setSelectedPage(1);
     if (inputRef.current) inputRef.current.value = '';
-  };
-
-  const handleLoadSession = async (filename) => {
-    setLoadingFile(filename);
-    setError(null);
-    try {
-      const res = await fetch('/api/load', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to load session');
-      }
-      const session = await res.json();
-      onLoadSession(session, filename);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoadingFile(null);
-    }
   };
 
   const isJson = file && file.type === 'application/json';
@@ -119,12 +169,12 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
             <span className={styles.icon}>+</span>
             <p>Drag & drop your bill here</p>
             <p className={styles.hint}>or click to browse</p>
-            <p className={styles.formats}>JPG, PNG, PDF, or JSON (test mode)</p>
+            <p className={styles.formats}>JPG, PNG, WebP, PDF, or JSON (test mode)</p>
           </div>
           <input
             ref={inputRef}
             type="file"
-            accept=".jpg,.jpeg,.png,.pdf,.json"
+            accept=".jpg,.jpeg,.png,.webp,.pdf,.json"
             onChange={handleInputChange}
             className={styles.hiddenInput}
           />
@@ -203,31 +253,24 @@ export default function Upload({ initialFile, initialPreviewUrl, onConfirm, onLo
           </button>
         </div>
       )}
+      {!file && (
+        <>
+          <button onClick={openCamera} className={styles.cameraBtn}>
+            Take a photo
+          </button>
+          <input
+            ref={captureInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleInputChange}
+            className={styles.hiddenInput}
+          />
+        </>
+      )}
+      {cameraOpen && <CameraModal onCapture={handleCapture} onClose={() => setCameraOpen(false)} />}
       {error && <p className={styles.error}>{error}</p>}
 
-      {history.length > 0 && !file && (
-        <div className={styles.historySection}>
-          <h3 className={styles.historyTitle}>Past Sessions</h3>
-          <div className={styles.historyList}>
-            {history.map((filename) => {
-              const display = filename.replace('.json', '').replace(/-/g, ' ');
-              return (
-                <button
-                  key={filename}
-                  className={styles.historyItem}
-                  onClick={() => handleLoadSession(filename)}
-                  disabled={!!loadingFile}
-                >
-                  <span className={styles.historyName}>{display}</span>
-                  {loadingFile === filename && (
-                    <span className={styles.historyLoading}>Loading...</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -142,3 +142,11 @@ vite.config.ts.timestamp-*
 client/build/
 
 .claude
+# Architect-Typist state
+.state/*
+!.state/conventions.md
+!.state/maintain/
+!.state/maintain/**
+
+# Local data (people list only)
+data/
