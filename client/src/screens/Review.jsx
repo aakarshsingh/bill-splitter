@@ -1,17 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Review.module.css';
-import { FORMULA_MODES, calcItemBreakdown, calcTotal } from '../calcLib';
+import {
+  CATEGORIES,
+  RATE_FIELDS,
+  RATE_PRESETS,
+  DEFAULT_RATES,
+  applyPreset,
+  legacyToRates,
+  calcItemBreakdown,
+  calcTotal,
+} from '../calcLib';
+import { shrinkImage } from '../imageUtils';
+import PriceInput from '../components/PriceInput';
+
+function ratesEqual(a, b) {
+  return CATEGORIES.every((cat) => RATE_FIELDS.every(({ key }) => a[cat][key] === b[cat][key]));
+}
+
+function initialRates(data) {
+  if (data.rates) return data.rates;
+  if (data.tax != null || data.serviceCharge != null) {
+    return legacyToRates(data.tax || 0, data.serviceCharge || 0, data.formulaMode);
+  }
+  return DEFAULT_RATES;
+}
 
 export default function Review({ file, previewUrl, pdfPage, initialData, onConfirm }) {
   const hasInitial = initialData && initialData.items;
   const [items, setItems] = useState(hasInitial ? initialData.items : []);
   const [establishment, setEstablishment] = useState(hasInitial ? initialData.establishment : '');
-  const [tax, setTax] = useState(hasInitial ? initialData.tax : 0);
-  const [serviceCharge, setServiceCharge] = useState(hasInitial ? initialData.serviceCharge : 0);
+  const [rates, setRates] = useState(hasInitial ? initialRates(initialData) : DEFAULT_RATES);
   const [billTotal, setBillTotal] = useState(hasInitial ? initialData.billTotal : 0);
   const [billDate, setBillDate] = useState(hasInitial ? initialData.billDate || null : null);
-  const [testAssignments, setTestAssignments] = useState(hasInitial ? initialData.testAssignments || null : null);
-  const [formulaMode, setFormulaMode] = useState(hasInitial ? initialData.formulaMode || 'indian-gst' : 'indian-gst');
   const [loading, setLoading] = useState(!hasInitial);
   const [error, setError] = useState(null);
 
@@ -28,11 +48,12 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
           const text = await file.text();
           data = JSON.parse(text);
         } else {
-          const base64 = await fileToBase64(file);
+          const upload = await shrinkImage(file);
+          const base64 = await fileToBase64(upload);
           const res = await fetch('/api/parse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileData: base64, mimeType: file.type, pageNumber: pdfPage || null }),
+            body: JSON.stringify({ fileData: base64, mimeType: upload.type, pageNumber: pdfPage || null }),
           });
           if (!res.ok) {
             const err = await res.json();
@@ -42,11 +63,9 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
         }
         setEstablishment(data.establishment || '');
         setItems(data.items || []);
-        setTax(data.tax || 0);
-        setServiceCharge(data.serviceCharge || 0);
+        setRates(initialRates(data));
         setBillTotal(data.billTotal || 0);
         if (data.date) setBillDate(data.date);
-        if (data.testAssignments) setTestAssignments(data.testAssignments);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -64,6 +83,14 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
     );
   };
 
+  const updateRate = (category, key, value) => {
+    setRates((prev) => ({ ...prev, [category]: { ...prev[category], [key]: value } }));
+  };
+
+  const toggleOverride = (item, effective) => {
+    updateItem(item.id, 'effectiveOverride', item.effectiveOverride == null ? Math.round(effective) : null);
+  };
+
   const removeItem = (id) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
@@ -76,15 +103,12 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
   };
 
   const formatPrice = (paise) => (paise / 100).toFixed(2);
-  const parsePriceInput = (str) => {
-    const num = parseFloat(str);
-    return isNaN(num) ? 0 : Math.round(num * 100);
-  };
 
   const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
-  const calculated = calcTotal(items, tax, serviceCharge, formulaMode);
+  const calculated = calcTotal(items, rates);
   const diff = billTotal > 0 ? Math.abs(calculated - billTotal) : 0;
-  const isMatched = billTotal > 0 && diff <= 100; // within 1 rupee
+  const isMatched = billTotal > 0 && diff <= 100; // within 1 rupee — receipts round off
+  const activePreset = RATE_PRESETS.find((p) => ratesEqual(applyPreset(p.id, rates), rates));
 
   if (loading) {
     return (
@@ -145,9 +169,9 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
             </thead>
             <tbody>
               {items.map((item) => {
-                const bd = calcItemBreakdown(item, tax, serviceCharge, formulaMode);
+                const bd = calcItemBreakdown(item, rates);
                 return (
-                  <tr key={item.id}>
+                  <tr key={item.id} className={bd.overridden ? styles.overrideRow : ''}>
                     <td>
                       <input
                         type="text"
@@ -178,20 +202,35 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
                       />
                     </td>
                     <td>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formatPrice(item.unitPrice)}
-                        onChange={(e) =>
-                          updateItem(item.id, 'unitPrice', parsePriceInput(e.target.value))
-                        }
+                      <PriceInput
+                        paise={item.unitPrice}
+                        onChange={(v) => updateItem(item.id, 'unitPrice', v)}
                         className={styles.priceInput}
                       />
                     </td>
-                    <td className={styles.calcCol}>{formatPrice(bd.scAmount)}</td>
-                    <td className={styles.calcCol}>{formatPrice(bd.taxAmount)}</td>
-                    <td className={styles.lineTotal}>{formatPrice(bd.effective)}</td>
+                    <td className={styles.calcCol}>{bd.overridden ? '—' : formatPrice(bd.scAmount)}</td>
+                    <td className={styles.calcCol}>{bd.overridden ? '—' : formatPrice(bd.taxAmount)}</td>
+                    <td className={styles.lineTotal}>
+                      <div className={styles.effectiveCell}>
+                        {bd.overridden ? (
+                          <PriceInput
+                            paise={item.effectiveOverride}
+                            onChange={(v) => updateItem(item.id, 'effectiveOverride', v)}
+                            className={styles.overrideInput}
+                            title="Effective price override (incl. all taxes)"
+                          />
+                        ) : (
+                          formatPrice(bd.effective)
+                        )}
+                        <button
+                          onClick={() => toggleOverride(item, bd.effective)}
+                          className={`${styles.overrideBtn} ${bd.overridden ? styles.overrideOn : ''}`}
+                          title={bd.overridden ? 'Remove override — use rates' : 'Override effective price'}
+                        >
+                          {bd.overridden ? '↺' : '✎'}
+                        </button>
+                      </div>
+                    </td>
                     <td>
                       <button
                         onClick={() => removeItem(item.id)}
@@ -210,48 +249,51 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
             + Add Item
           </button>
 
-          <div className={styles.chargesRow}>
-            <div className={styles.chargeField}>
-              <label>Tax/GST %</label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                value={tax}
-                onChange={(e) => setTax(parseFloat(e.target.value) || 0)}
-                className={styles.chargeInput}
-              />
-            </div>
-            <div className={styles.chargeField}>
-              <label>Service Charge %</label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                value={serviceCharge}
-                onChange={(e) => setServiceCharge(parseFloat(e.target.value) || 0)}
-                className={styles.chargeInput}
-              />
-            </div>
-          </div>
-
-          <div className={styles.formulaSection}>
-            <div className={styles.formulaLabel}>Tax/SC Formula</div>
-            <div className={styles.formulaOptions}>
-              {FORMULA_MODES.map((mode) => (
+          <div className={styles.ratesSection}>
+            <div className={styles.ratesLabel}>Tax & Service Charge</div>
+            <div className={styles.presetOptions}>
+              {RATE_PRESETS.map((preset) => (
                 <button
-                  key={mode.id}
-                  className={`${styles.formulaBtn} ${formulaMode === mode.id ? styles.formulaActive : ''}`}
-                  onClick={() => setFormulaMode(mode.id)}
-                  title={mode.formula}
+                  key={preset.id}
+                  className={`${styles.presetBtn} ${activePreset?.id === preset.id ? styles.presetActive : ''}`}
+                  onClick={() => setRates(applyPreset(preset.id, rates))}
                 >
-                  <span className={styles.formulaBtnLabel}>{mode.label}</span>
-                  <span className={styles.formulaBtnDesc}>{mode.description}</span>
+                  <span className={styles.presetBtnLabel}>{preset.label}</span>
+                  <span className={styles.presetBtnDesc}>{preset.description}</span>
                 </button>
               ))}
             </div>
+            <table className={styles.ratesTable}>
+              <thead>
+                <tr>
+                  <th></th>
+                  {RATE_FIELDS.map(({ key, label }) => (
+                    <th key={key}>{label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {CATEGORIES.map((cat) => (
+                  <tr key={cat}>
+                    <td className={styles.rateCategory}>{cat === 'food' ? 'Food' : 'Alcohol'}</td>
+                    {RATE_FIELDS.map(({ key }) => (
+                      <td key={key}>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          value={rates[cat][key]}
+                          onChange={(e) => updateRate(cat, key, parseFloat(e.target.value) || 0)}
+                          className={styles.chargeInput}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div className={styles.formulaNote}>
-              {FORMULA_MODES.find((m) => m.id === formulaMode)?.formula}
+              Effective = CP + CP×SC% + CP×Tax% + SC×TaxOnSC%. Use ✎ on an item for one-off taxes (e.g. cess).
             </div>
           </div>
 
@@ -264,45 +306,29 @@ export default function Review({ file, previewUrl, pdfPage, initialData, onConfi
               <span>Calculated total (with tax + SC)</span>
               <span>{formatPrice(calculated)}</span>
             </div>
+            <div className={styles.totalRow}>
+              <span>Bill total (from receipt)</span>
+              <PriceInput
+                paise={billTotal || null}
+                onChange={setBillTotal}
+                placeholder="Enter bill total"
+                className={styles.billTotalInput}
+              />
+            </div>
             {billTotal > 0 && (
-              <>
-                <div className={styles.totalRow}>
-                  <span>Bill total (from receipt)</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formatPrice(billTotal)}
-                    onChange={(e) => setBillTotal(parsePriceInput(e.target.value))}
-                    className={styles.billTotalInput}
-                  />
-                </div>
-                <div className={`${styles.matchStatus} ${isMatched ? styles.matched : styles.mismatch}`}>
-                  {isMatched
-                    ? 'Totals match'
-                    : `Mismatch of ${formatPrice(diff)} — adjust items, tax, or SC to reconcile`}
-                </div>
-              </>
-            )}
-            {billTotal === 0 && (
-              <div className={styles.totalRow}>
-                <span>Bill total (manual)</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value=""
-                  placeholder="Enter bill total"
-                  onChange={(e) => setBillTotal(parsePriceInput(e.target.value))}
-                  className={styles.billTotalInput}
-                />
+              <div className={`${styles.matchStatus} ${isMatched ? styles.matched : styles.mismatch}`}>
+                {!isMatched
+                  ? `Mismatch of ${formatPrice(diff)} — adjust items, rates, or override an item to reconcile`
+                  : diff >= 1
+                    ? `Totals match (${formatPrice(diff)} round-off)`
+                    : 'Totals match'}
               </div>
             )}
           </div>
 
           <button
             onClick={() =>
-              onConfirm({ establishment, items, tax, serviceCharge, billTotal, billDate, testAssignments, formulaMode })
+              onConfirm({ establishment, items, rates, billTotal, billDate })
             }
             className={styles.confirmBtn}
             disabled={items.length === 0}

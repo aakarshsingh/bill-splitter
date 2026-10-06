@@ -4,20 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A full-stack local bill splitting app for personal use.
-Upload a bill image/PDF -> AI parses it -> assign items to people -> calculate fair split with tax and service charge baked in proportionally.
+A full-stack bill splitting app for personal use.
+Upload or photograph a bill -> AI parses it -> assign items to people -> calculate a fair split with tax and service charge baked in proportionally.
 
-Single user. No auth. No cloud. Runs locally.
+Single user. Runs locally or on Railway. Only the people list is persisted — bills are never saved.
+When `APP_PASSWORD` is set (Railway), every route except `/api/health` requires it via HTTP Basic Auth (`server/auth.js`; any username). Unset locally = no password.
 
 ## Tech Stack
 
 | Layer | Tech |
 |---|---|
-| Frontend | React |
+| Frontend | React (Create React App) |
 | Backend | Node.js + Express |
-| AI | Claude API (Vision + NLP) — use `claude-sonnet-4-20250514` |
-| Storage | Local JSON files via `fs` module |
-| Run | `npm start` from root |
+| AI | Claude API (Vision) — `claude-sonnet-5-5` |
+| Storage | `people.json` in `DATA_DIR` via `fs` |
+| Hosting | Railway (`.railway/railway.ts`, volume at `/app/data`) |
 
 ## Project Structure
 
@@ -26,151 +27,105 @@ bill-splitter/
 ├── client/                  # React frontend
 │   ├── src/
 │   │   ├── screens/         # One component per screen
-│   │   ├── components/      # Shared UI components
+│   │   ├── components/      # Shared UI components (PriceInput)
+│   │   ├── calcLib.js       # Rates + split math
+│   │   ├── imageUtils.js    # Downscale photos / capture camera frames
 │   │   └── App.jsx
 │   └── package.json
-├── server/                  # Express backend
+├── server/
 │   ├── routes/
-│   │   ├── parse.js         # POST /api/parse — bill image -> JSON
-│   │   ├── assign.js        # POST /api/assign — items + instructions -> assignments
-│   │   ├── people.js        # GET/POST /api/people
-│   │   ├── preferences.js   # GET/POST /api/preferences
-│   │   ├── save.js          # POST /api/save — save session to history
-│   │   └── load.js          # POST /api/load — load session from JSON upload
-│   └── index.js
-├── data/
-│   ├── people.json          # Master friends list
-│   ├── preferences.json     # Learned preferences per person
-│   ├── test-bill.json       # Sample parsed bill for test mode
-│   └── history/             # One file per session: place-date.json
-├── CLAUDE.md
+│   │   ├── parse.js         # POST /api/parse — bill image/PDF -> JSON
+│   │   └── people.js        # GET/POST /api/people
+│   ├── auth.js              # APP_PASSWORD gate (HTTP Basic)
+│   └── index.js             # Also serves client/build and /api/health
+├── fixtures/
+│   └── test-bill.json       # Sample parsed bill for test mode
+├── data/                    # gitignored — people.json only
+├── .railway/railway.ts      # Railway infrastructure as code
 └── package.json
 ```
 
 ## Navigation
 
-App uses a stepper nav bar at the top. Users can click back to any completed step without losing data. Session state is held in `App.jsx`'s `sessionData` object and passed as `initialData`/`initialFile` props so screens restore their state on revisit (no re-fetching APIs).
-
-Key props pattern: each screen receives its initial state from `sessionData` and calls `onConfirm(data)` to save back and advance.
+Stepper nav bar at the top. Users can click back to any completed step without losing data. Session state lives in `App.jsx`'s `sessionData` and is passed down as `initial*` props so screens restore on revisit without re-calling APIs. Each screen calls `onConfirm(data)` to save back and advance.
 
 ## Test Mode
 
-Upload a `.json` file instead of an image/PDF to skip all AI API calls. The Review screen reads the JSON directly as parsed bill data. The Assign screen uses `testAssignments` from the same JSON to skip the `/api/assign` call. Use `data/test-bill.json` as a sample (8 items, mix of food and alcohol, 5% tax, 10% SC, pre-built assignments). Test JSON must match the `/api/parse` output schema, with optional `testAssignments` field.
+Upload a `.json` file instead of an image/PDF to skip the AI call. Review reads it directly as parsed bill data. Must match the `/api/parse` output schema. `fixtures/test-bill.json` is a sample (8 items, food + alcohol, Indian GST rates, 10% SC). Older JSON with `tax`/`serviceCharge`/`formulaMode` is converted to `rates` on load. Output's **Export JSON** produces a file that can be re-uploaded this way.
 
 ## Screen Flow
 
 ```
-Upload -> Review -> People -> Instructions -> Assign -> Split -> Output
-  1         2        3          4            5        6       7
+Upload -> Review -> People -> Assign -> Split -> Output
+  1         2        3         4        5        6
 ```
 
-1. **Upload** — Drag & drop or file picker for image/PDF. Preview uploaded file. On confirm -> advance to Review. Accepts `initialFile`/`initialPreviewUrl` to restore on back-nav. **Past sessions** section lists saved history files from `/api/load` sorted by most recently modified; clicking one restores the full session and jumps to the appropriate screen.
-2. **Review** — Calls `/api/parse` on first visit (skips if `initialData` present from back-nav or JSON test file). Editable table with item name, type (food/alcohol), qty, unit price, SC amount, tax amount, effective price. Tax/GST % and SC % with manual override. **Formula selector** with clickable presets for how tax and SC combine (Indian GST, Flat, SC-then-Tax, Tax-then-SC). Side-by-side bill preview. Bill total reconciliation with match/mismatch indicator.
-3. **People** — Load from `data/people.json` as selectable chips (sorted alphabetically). Select All / Select None buttons. Can add new person (saves back, auto-selected). Selected chips show a ✎ edit icon that opens a **modal dialog** for structured preferences: diet (veg/non-veg), meats (chicken, mutton, pork, beef, seafood — only for non-veg), drinks (beer, wine, whisky, vodka, gin, rum, cocktails, non-drinker). Modal shows live summary and saves to server immediately. Passes `selectedPeople` + `preferences` forward.
-4. **Instructions** — Auto-generates instructions from preferences on first visit (e.g. "X is vegetarian", "Y doesn't eat pork or beef", "Z doesn't drink", "W drinks beer and wine"). Shows people tags and preference summary as reference. Users can edit/remove auto-generated instructions, add free text, or use quick-add example buttons (**bill-aware** — only shows examples referencing actual items on the bill, e.g. won't suggest "had all the wine" if no wine is on the bill). **Autocomplete**: `@` for people names, `#` for item names — both with arrow key navigation, Enter/Tab to select, Escape to dismiss. Dropdown shows a header label to distinguish type. Clear all button to start fresh. On back-nav, restores user's edited list (no re-generation).
-5. **Assign** — Calls `/api/assign` on first visit (skips if test mode with `testAssignments` or back-nav with `initialAssignments`). Table with items as rows and people as columns. **Sticky header row and first column** for scrollability. Each cell has **+/- buttons** to adjust share parts — proportional splitting (e.g. 1:1:1 = equal thirds, 2:1 = two-thirds/one-third). Shows computed fraction and per-person amount per item. Click the count number to quickly solo-assign. AI pre-populates suggestions; full manual override. Per-row "split equal" and "clear" buttons, bulk "split all equal", "clear all", and **"Re-suggest with AI"** (explicit re-fetch instead of auto-calling on back-nav). Assignments persist when navigating back to earlier screens for edits. Validates that every item has at least one person assigned. Shows per-person running totals in footer.
-6. **Split** — Pure frontend calculation, no API. Per-person cards sorted by total (highest first), each expandable to show itemised breakdown table (item name, type, effective price, share fraction, amount). Proportional share bar per person. Overview bar shows item count, people, tax/SC rates, and grand total. Bill total reconciliation warning if mismatch. On confirm, passes computed split data to Screen 7.
-7. **Output** — Summary table (person, items, amount) sorted by total. One-click **Copy for WhatsApp** button generates formatted text with bold names, item breakdowns, and totals (Rs amounts rounded to whole numbers). WhatsApp preview shown below. **Save Session** writes full session to `data/history/establishment-YYYY-MM-DD.json` via `/api/save`; sessions loaded from history overwrite the original file instead of creating a new one. **Export as Image** captures the full summary + detailed breakdown as a 2x PNG via `html2canvas`. Detailed per-person breakdown with item-level share fractions (collapsible). **Start Over** button (appears after saving) resets all session data and returns to the Upload screen.
-
+1. **Upload** — Drag & drop / file picker (JPG, PNG, WebP, PDF, JSON) or **Take a photo**. The camera opens a live in-app viewfinder (`getUserMedia`, rear camera) in secure contexts (https/localhost); otherwise falls back to the OS camera via `<input capture>`. Multi-page PDFs get a page picker.
+2. **Review** — Calls `/api/parse` on first visit (skipped for JSON or back-nav). Large photos are downscaled first (≤2400px, ≤3.5MB) to stay under Claude's 5MB image limit. Editable table: name, type (food/alcohol), qty, unit price, SC, tax, effective. **Rate grid** (food/alcohol × SC% / Tax% / Tax-on-SC%) with preset buttons. **✎ per item** overrides the effective price for odd taxes (e.g. cess); ↺ removes it. Bill total reconciliation — within ₹1 shows as round-off.
+3. **People** — Chips from `/api/people`, sorted alphabetically. Select All / None. Add a person (saved, auto-selected).
+4. **Assign** — Items as rows, people as columns, sticky header/first column/footer. Tap a count to toggle a person in/out; +/- to weight parts. Row actions: **↑ same as above**, **= split equally**, **x clear**. Bulk: **split remaining equally**, split all, clear all. Progress bar + "unassigned only" filter. Items with qty > 1 show a parts-vs-units hint. Must assign every item to continue.
+5. **Split** — Pure frontend. Per-person cards (highest first), expandable itemised breakdown, share bar. Overview shows food/alcohol tax rates. Discount by %, flat, or final amount (largest-remainder allocation).
+6. **Output** — Summary table, **Copy for WhatsApp**, **Export as Image** (html2canvas, 2x PNG), **Export JSON**, **Start Over**. Collapsible detailed breakdown.
 
 ## API Routes
 
 | Method | Route | Purpose |
 |---|---|---|
-| POST | `/api/parse` | Bill image/PDF -> structured JSON via Claude Vision |
-| POST | `/api/assign` | Items + instructions + preferences -> suggested assignments via Claude NLP |
-| GET | `/api/people` | Load master friends list |
-| POST | `/api/people` | Add new person to master list |
-| GET | `/api/preferences` | Load all structured preferences |
-| POST | `/api/preferences` | Update one person's preferences `{ name, prefs }` |
-| POST | `/api/save` | Save session to history + update preferences via learning. Accepts `overwriteFilename` to update an existing file |
-| GET | `/api/load` | List saved session filenames (sorted by modification time, newest first) |
-| POST | `/api/load` | Load a specific session by filename |
+| POST | `/api/parse` | Bill image/PDF (base64) -> structured JSON via Claude Vision |
+| GET | `/api/people` | Load people list |
+| POST | `/api/people` | Add a person `{ name }` |
+| GET | `/api/health` | Railway healthcheck |
 
-## AI Integration
-
-### Bill Parser (Screen 2) — `POST /api/parse`
-- Input: base64 encoded image or PDF
-- Claude Vision extracts: line items (name, qty, unit price, food/alcohol category), tax %, service charge %, bill total, date
-- Output: `{ establishment, date, items: [{ id, name, qty, unitPrice, category }], tax, serviceCharge, billTotal }`
-- `date` is YYYY-MM-DD from the receipt, or `null` if not found (falls back to current date downstream)
-
-### Assignment Engine (Screen 5) — `POST /api/assign`
-- Input: `{ items, people, instructions, preferences }`
-- Claude NLP interprets instructions, matches items to people, uses dietary/drink preferences as hints
-- Output: `{ assignments: { "item-id": [{ person, share }] }, reasoning }`
-- Share values are fractions like "1/2", "1/3" or "1" for full item. Shares per item must sum to 1.
+### Bill Parser — `POST /api/parse`
+- Input: `{ fileData (base64), mimeType, pageNumber? }`
+- Beta endpoint with server-side refusal fallback (`fallbacks: 'default'`, beta `server-side-fallback-2026-07-01`).
+- Structured output (`output_config.format` JSON schema). Output: `{ establishment, date, items: [{ id, name, qty, unitPrice, category }], rates, billTotal }`
+- Prompt rules that matter: amount column is often the **line total** (unitPrice = total ÷ qty); drop zero-priced parent lines; infer which category a tax covers from **amounts**, not labels; CGST + SGST are summed; liquor VAT is alcohol tax.
+- `date` is YYYY-MM-DD or `null` (falls back to today downstream).
 
 ## Split Calculation Logic
 
-Calculation lives in `client/src/calcLib.js` — shared by Review, Assign, and Split screens.
-
-The user selects a **formula mode** in the Review screen (stored as `reviewData.formulaMode`). Four presets:
-
-| Mode | Formula | Notes |
-|---|---|---|
-| `indian-gst` (default) | Food: `(base + SC) × (1 + tax%)`. Alcohol: `base + SC + SC×tax%` | Tax only on SC for alcohol |
-| `flat` | `base + base×tax% + base×SC%` | Both applied independently |
-| `sc-then-tax` | `(base + base×SC%) × (1 + tax%)` | Same for all categories |
-| `tax-then-sc` | `(base + base×tax%) × (1 + SC%)` | Same for all categories |
+All math lives in `client/src/calcLib.js` — shared by Review, Assign, and Split.
 
 ```
-person_share = effective * (person_parts / total_parts_for_item)
-person_total = sum of all person_share values for that person
+rates = { food: { sc, tax, scTax }, alcohol: { sc, tax, scTax } }   // percentages
+effective = base + base×sc + base×tax + (base×sc)×scTax              // base = unitPrice × qty
+effective = item.effectiveOverride                                   // when set (paise)
+person_share = effective × (person_parts / total_parts_for_item)
 ```
 
-Assignment data is stored as `{ itemId: { personName: parts } }` where `parts` is an integer representing how many shares that person has. The fraction is computed at render time.
+Presets fill the grid from the food SC%/tax% (tax-on-SC is zeroed when SC is 0):
 
-The Review screen shows a bill total reconciliation — the calculated total should match the receipt total.
+| Preset | Food (SC / Tax / Tax on SC) | Alcohol (SC / Tax / Tax on SC) | Example |
+|---|---|---|---|
+| `indian-gst` | S / T / T | S / 0 / T | Bengaluru — liquor price includes tax |
+| `alcohol-vat` | S / T / T | S / 22 / T | Goa — VAT on liquor |
+| `flat` | S / T / 0 | S / T / 0 | |
+| `compound` | S / T / T | S / T / T | Covers old sc-then-tax and tax-then-sc (same total) |
 
-## Storage Schemas
+Assignments are stored as `{ itemId: { personName: parts } }` (integer parts); fractions are computed at render time.
 
-### data/people.json
+## Storage
+
+### data/people.json (`DATA_DIR`, default `./data`)
 ```json
 [{ "id": "uuid", "name": "Aakarsh" }]
 ```
+Created empty on server start if missing. On Railway, `DATA_DIR=/app/data` is a mounted volume.
 
-### data/preferences.json
-```json
-{
-  "Aakarsh": {
-    "diet": "non-veg",
-    "meats": ["chicken", "mutton"],
-    "drinks": ["beer", "whisky"]
-  }
-}
-```
-Structured preferences: `diet` (veg/non-veg), `meats` (array, only for non-veg), `drinks` (array, empty = non-drinker). Edited in Screen 3. Auto-updated on save: extracts known meat/drink keywords from assigned item names (e.g. "Butter Chicken" adds `chicken`, "Kingfisher Beer" adds `beer`). Skips items shared by everyone (too generic). Only learns meats for non-veg people. Variants mapped to canonical values (e.g. lamb->mutton, prawn->seafood, whiskey->whisky).
+## Deployment (Railway)
 
-### data/history/establishment-YYYY-MM-DD.json
-Must contain everything to fully repaint the session (all 7 screens): establishment, date, people, instructions, items, tax, serviceCharge, assignments, splits.
+- Project `as-bill-splitter`, service `bill-splitter`, auto-deploys from GitHub `main`.
+- Railpack builds with root `npm run build` (installs + builds `client/`) and runs `npm start`.
+- `.railway/railway.ts` is the source of truth for the service, volume, and healthcheck. After editing: `railway config plan`, then `railway config apply`. Never commit secrets — variables use `preserve()`.
+- `ANTHROPIC_API_KEY` and `APP_PASSWORD` are Railway variables; locally the key goes in `server/.env` (leave `APP_PASSWORD` unset).
 
 ## Conventions
 
-- `uuid` package for all IDs
-- All monetary values stored as numbers (paise/cents), displayed formatted
-- Dates in `YYYY-MM-DD` format
-- History filename: `establishment-name-YYYY-MM-DD.json` (lowercase, hyphens)
-- React screens in `client/src/screens/`, one file per screen
-- No TypeScript — plain JavaScript throughout
-- No CSS frameworks — plain CSS modules per component
-- `data/` contents are gitignored
-
-## Current Status
-
-- [x] Project scaffold + package.json files
-- [x] Stepper navigation with back-nav support
-- [x] Screen 1 — Upload (drag & drop, file picker, preview, JSON test mode)
-- [x] Screen 2 — Review (AI parse, editable table, food/alcohol, tax/SC, bill reconciliation)
-- [x] Screen 3 — People (selectable chips, add person, structured preferences editor)
-- [x] Screen 4 — Instructions (free text hints, preference-aware examples, @ people / # items autocomplete)
-- [x] Screen 5 — Assign (AI suggestions, +/- share buttons, manual override, test mode)
-- [x] Screen 6 — Split (per-person cards, itemised breakdown, share bar, no API)
-- [x] Screen 7 — Output (summary table, WhatsApp copy, save session, detailed breakdown)
-- [x] Save/Load — `/api/save` writes to `data/history/`, `/api/load` lists and loads sessions
-- [x] Past sessions list on Upload screen for restoring saved sessions
-- [x] Preference learning on save (meats/drinks updated from assigned item keywords)
-- [x] Formula builder — selectable tax/SC calculation presets in Review screen
-- [x] Sticky header/column in Assign table, assignments persist on back-nav, Re-suggest button
-- [x] Save overwrites original file when loaded from history
-- [x] Export as Image — full breakdown captured as PNG via html2canvas
+- `uuid` for server IDs; `crypto.randomUUID()` for client-added items
+- Money is integer paise everywhere; format only at display. Use `PriceInput` for rupee inputs
+- Dates in `YYYY-MM-DD`
+- React screens in `client/src/screens/`, one file + `.module.css` per screen
+- No TypeScript in the app (`.railway/railway.ts` is the only exception) — plain JavaScript
+- No CSS frameworks — CSS modules
+- `data/` is gitignored; sample data lives in `fixtures/`

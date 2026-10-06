@@ -44,19 +44,13 @@ export default function Output({ sessionData, onStartOver }) {
   const {
     reviewData,
     selectedPeople: people,
-    preferences,
-    instructions,
     assignments,
     splitData,
-    historyFilename,
   } = sessionData;
 
-  const { items, tax, serviceCharge, establishment, billDate, formulaMode, billTotal } = reviewData || {};
+  const { items, rates, establishment, billDate, billTotal } = reviewData || {};
   const splitDiscount = sessionData.splitDiscount;
 
-  const [saving, setSaving] = useState(false);
-  const [saveResult, setSaveResult] = useState(null);
-  const [saveError, setSaveError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -104,57 +98,15 @@ export default function Output({ sessionData, onStartOver }) {
     }
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    setSaveError(null);
-    try {
-      const session = {
-        establishment,
-        date: billDate || new Date().toISOString().slice(0, 10),
-        billDate: billDate || null,
-        items,
-        tax,
-        serviceCharge,
-        billTotal: reviewData?.billTotal,
-        formulaMode: reviewData?.formulaMode || 'indian-gst',
-        people: people?.map((p) => ({ id: p.id, name: p.name })),
-        preferences,
-        instructions,
-        assignments,
-        splitData,
-        discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal, pct: discountPct || null } : null,
-      };
-      const res = await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session, overwriteFilename: historyFilename || null }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to save');
-      }
-      const data = await res.json();
-      setSaveResult(data.filename);
-    } catch (err) {
-      setSaveError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleExportJson = () => {
     const session = {
       establishment,
       date: billDate || new Date().toISOString().slice(0, 10),
       billDate: billDate || null,
       items,
-      tax,
-      serviceCharge,
+      rates,
       billTotal: billTotal || null,
-      formulaMode: formulaMode || 'indian-gst',
       people: people?.map((p) => ({ id: p.id, name: p.name })),
-      preferences,
-      instructions,
       assignments,
       splitData,
       discount: hasDiscount ? { amount: totalDiscount, preDiscountTotal, pct: discountPct || null } : null,
@@ -247,14 +199,6 @@ export default function Output({ sessionData, onStartOver }) {
         </button>
 
         <button
-          className={`${styles.actionBtn} ${styles.saveBtn}`}
-          onClick={handleSave}
-          disabled={saving || !!saveResult}
-        >
-          {saving ? 'Saving...' : saveResult ? `Saved: ${saveResult}` : 'Save Session'}
-        </button>
-
-        <button
           className={`${styles.actionBtn} ${styles.exportBtn}`}
           onClick={handleExportImage}
           disabled={exporting}
@@ -269,19 +213,13 @@ export default function Output({ sessionData, onStartOver }) {
           Export JSON
         </button>
 
-        {saveResult && onStartOver && (
-          <button
-            className={`${styles.actionBtn} ${styles.startOverBtn}`}
-            onClick={onStartOver}
-          >
-            Start Over
-          </button>
-        )}
+        <button
+          className={`${styles.actionBtn} ${styles.startOverBtn}`}
+          onClick={onStartOver}
+        >
+          Start Over
+        </button>
       </div>
-
-      {saveError && (
-        <div className={styles.error}>{saveError}</div>
-      )}
 
       <div className={styles.previewSection}>
         <button

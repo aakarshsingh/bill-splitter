@@ -1,12 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import styles from './Split.module.css';
-import { calcItemBreakdown } from '../calcLib';
+import { CATEGORIES, calcItemBreakdown, ratesFor } from '../calcLib';
 
 function formatPrice(paise) {
   return (paise / 100).toFixed(2);
 }
 
-function computeSplit(items, assignments, people, tax, serviceCharge, formulaMode) {
+function rateSummary(r) {
+  return r.sc ? `${r.tax}% + ${r.sc}% SC` : `${r.tax}%`;
+}
+
+function computeSplit(items, assignments, people, rates) {
   const itemsById = {};
   for (const item of items) itemsById[item.id] = item;
 
@@ -17,7 +21,7 @@ function computeSplit(items, assignments, people, tax, serviceCharge, formulaMod
   }
 
   for (const item of items) {
-    const bd = calcItemBreakdown(item, tax, serviceCharge, formulaMode);
+    const bd = calcItemBreakdown(item, rates);
     const itemParts = assignments[item.id] || {};
     const totalParts = Object.values(itemParts).reduce((s, v) => s + v, 0);
     if (totalParts === 0) continue;
@@ -46,7 +50,7 @@ function computeSplit(items, assignments, people, tax, serviceCharge, formulaMod
 }
 
 export default function Split({ reviewData, people, assignments, initialDiscount, onConfirm }) {
-  const { items, tax, serviceCharge, establishment, billTotal, formulaMode } = reviewData;
+  const { items, rates, establishment, billTotal } = reviewData;
   const [expandedPerson, setExpandedPerson] = useState(null);
   const [discountPct, setDiscountPct] = useState(
     initialDiscount?.pct || ''
@@ -62,8 +66,8 @@ export default function Split({ reviewData, people, assignments, initialDiscount
   );
 
   const split = useMemo(
-    () => computeSplit(items, assignments, people, tax, serviceCharge, formulaMode),
-    [items, assignments, people, tax, serviceCharge, formulaMode]
+    () => computeSplit(items, assignments, people, rates),
+    [items, assignments, people, rates]
   );
 
   const preTotalPaise = useMemo(
@@ -154,14 +158,12 @@ export default function Split({ reviewData, people, assignments, initialDiscount
           <span className={styles.overviewLabel}>People</span>
           <span className={styles.overviewValue}>{people.length}</span>
         </div>
-        <div className={styles.overviewItem}>
-          <span className={styles.overviewLabel}>Tax</span>
-          <span className={styles.overviewValue}>{tax}%</span>
-        </div>
-        <div className={styles.overviewItem}>
-          <span className={styles.overviewLabel}>SC</span>
-          <span className={styles.overviewValue}>{serviceCharge}%</span>
-        </div>
+        {CATEGORIES.map((cat) => (
+          <div key={cat} className={styles.overviewItem}>
+            <span className={styles.overviewLabel}>{cat === 'food' ? 'Food tax' : 'Alcohol tax'}</span>
+            <span className={styles.overviewValue}>{rateSummary(ratesFor(rates, cat))}</span>
+          </div>
+        ))}
         {discountPaise > 0 ? (
           <>
             <div className={styles.overviewItem}>
